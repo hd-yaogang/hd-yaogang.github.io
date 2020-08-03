@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>linux 正向代理-Squid | 自律自由</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="linux 正向代理项目上web服务器不给访问外网，迁移服务器环境又太麻烦，决定给web服务器做正向代理，刚开始使用nginx，但是http代理一直不成功，后面大佬建议使用squid来达到相同目的，在不考虑安全和性能等其他问题下使用squid正式太简单了，下面进去正文 这里先贴出nginx代理，http没问题，但https不成功，如果有成功的希望留下几句指导一下，哈哈，谢谢 12345678910">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux 正向代理-Squid">
+<meta property="og:url" content="http://yoursite.com/2020/03/04/squid_proxy/index.html">
+<meta property="og:site_name" content="自律自由">
+<meta property="og:description" content="linux 正向代理项目上web服务器不给访问外网，迁移服务器环境又太麻烦，决定给web服务器做正向代理，刚开始使用nginx，但是http代理一直不成功，后面大佬建议使用squid来达到相同目的，在不考虑安全和性能等其他问题下使用squid正式太简单了，下面进去正文 这里先贴出nginx代理，http没问题，但https不成功，如果有成功的希望留下几句指导一下，哈哈，谢谢 12345678910">
+<meta property="og:locale">
+<meta property="article:published_time" content="2020-03-04T23:58:00.000Z">
+<meta property="article:modified_time" content="2020-08-03T12:06:59.043Z">
+<meta property="article:author" content="姚刚">
+<meta property="article:tag" content="linux">
+<meta property="article:tag" content="正向代理">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="自律自由" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 5.0.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">自律自由</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-squid_proxy" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/03/04/squid_proxy/" class="article-date">
+  <time datetime="2020-03-04T23:58:00.000Z" itemprop="datePublished">2020-03-04</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/linux/">linux</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      linux 正向代理-Squid
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="linux-正向代理"><a href="#linux-正向代理" class="headerlink" title="linux 正向代理"></a>linux 正向代理</h3><p><em>项目上web服务器不给访问外网，迁移服务器环境又太麻烦，决定给web服务器做正向代理，刚开始使用nginx，但是http代理一直不成功，后面大佬建议使用squid来达到相同目的，在不考虑安全和性能等其他问题下使用squid正式太简单了，下面进去正文</em></p>
+<p><strong>这里先贴出nginx代理，http没问题，但https不成功，如果有成功的希望留下几句指导一下，哈哈，谢谢</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">server &#123;  </span><br><span class="line">    resolver 114.114.114.114;      </span><br><span class="line">    listen 10002;  </span><br><span class="line">    location &#x2F; &#123;  </span><br><span class="line">        proxy_pass http:&#x2F;&#x2F;$http_host$request_uri;</span><br><span class="line">                proxy_set_header HOST $http_host;</span><br><span class="line">                proxy_buffers 256 4k;</span><br><span class="line">                proxy_max_temp_file_size 0k; </span><br><span class="line">                proxy_connect_timeout 30;</span><br><span class="line">                proxy_send_timeout 60;</span><br><span class="line">                proxy_read_timeout 60;</span><br><span class="line">                proxy_next_upstream error timeout invalid_header http_502;</span><br><span class="line">    &#125;  </span><br><span class="line">&#125;  </span><br><span class="line"></span><br><span class="line">server &#123;  </span><br><span class="line">    resolver 114.114.114.114;</span><br><span class="line">    listen 10001;  </span><br><span class="line">    location &#x2F; &#123;  </span><br><span class="line">       proxy_pass https:&#x2F;&#x2F;$host$request_uri;</span><br><span class="line">             proxy_buffers 256 4k;</span><br><span class="line">             proxy_max_temp_file_size 0k; </span><br><span class="line">       proxy_connect_timeout 30;</span><br><span class="line">       proxy_send_timeout 60;</span><br><span class="line">       proxy_read_timeout 60;</span><br><span class="line">       proxy_next_upstream error timeout invalid_header http_502;</span><br><span class="line">    &#125;  </span><br><span class="line">&#125; </span><br><span class="line"></span><br><span class="line">curl https:&#x2F;&#x2F;bizapi.jd.com&#x2F;api&#x2F;area&#x2F;getProvince    # 在另外机器上面测试成</span><br></pre></td></tr></table></figure>
+<p><strong>需要注意上面访问https时只能使用http，但是我成功</strong></p>
+<h3 id="配置squid代理"><a href="#配置squid代理" class="headerlink" title="配置squid代理"></a>配置squid代理</h3><p>1.安装squid</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum -y install squid    &#x2F;&#x2F;centos环境</span><br></pre></td></tr></table></figure>
+
+<p>2.修改内核参数，打开ip转发</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">vim &#x2F;etc&#x2F;sysctl.conf    # 修改0为1 ：# net.ipv4.ip_forward &#x3D; 1</span><br><span class="line">sysctl -p    # 使内核参数修改生效</span><br></pre></td></tr></table></figure>
+
+<p>3.简答修改squid配置文件</p>
+<p>![1532507600937][]</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">vim &#x2F;etc&#x2F;squid&#x2F;squid.conf </span><br><span class="line"># 将后面的http_access deny all 修改为 ：# allow</span><br><span class="line"># 将http_port修改为自己指定的代理端口：10001</span><br></pre></td></tr></table></figure>
+
+<p>4.启动squid</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">service start squid</span><br></pre></td></tr></table></figure>
+<p>5.测试代理</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl --proxy 192.168.6.166:10001 https:&#x2F;&#x2F;www.baidu.com</span><br></pre></td></tr></table></figure>
+
+<p>6.配置全局代理 vim /etc/profile</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">export http_proxy&#x3D;http:&#x2F;&#x2F;192.168.99.99:10001</span><br><span class="line">export https_proxy&#x3D;http:&#x2F;&#x2F;192.168.99.99:10001</span><br></pre></td></tr></table></figure>
+<p>7.再次测试</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl --proxy 192.168.6.166:10001 https:&#x2F;&#x2F;www.baidu.com    #成功</span><br></pre></td></tr></table></figure>
+
+<h3 id="为jvm参数设置http-https代理"><a href="#为jvm参数设置http-https代理" class="headerlink" title="为jvm参数设置http/https代理"></a>为jvm参数设置http/https代理</h3><p><em>上面我们只是设置了服务器的http代理，程序并不能使用，还需要设置jvm参数，不然java程序是使用不了服务器的全局http代理的，你可以修改java代码设置http代理，也可以添加jvm参数，这里选择修改jvm比较方便</em></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">#修改Tomact的startup.sh或者catalina.sh脚本，添加如下</span><br><span class="line"># ----- Execute The Requested Command -----------------------------------------</span><br><span class="line">#add jmx</span><br><span class="line">export CATALINA_OPTS&#x3D;&quot;$CATALINA_OPTS -Dhttp.proxySet&#x3D;true&quot;</span><br><span class="line">export CATALINA_OPTS&#x3D;&quot;$CATALINA_OPTS -Dhttps.proxyHost&#x3D;192.168.6.166&quot;</span><br><span class="line">export CATALINA_OPTS&#x3D;&quot;$CATALINA_OPTS -Dhttps.proxyPort&#x3D;10001&quot;</span><br><span class="line"></span><br><span class="line">#注意：这里我只配置了https，你也可以添加http和不代理的</span><br><span class="line">-Dhttp.proxySet&#x3D;true</span><br><span class="line">-Dhttp.proxyHost&#x3D;proxy.xyz.com</span><br><span class="line">-Dhttp.proxyPort&#x3D;8080</span><br><span class="line">-Dhttps.proxyHost&#x3D;proxy.xyz.com</span><br><span class="line">-Dhttps.proxyPort&#x3D;8080</span><br><span class="line">-Dhttp.nonProxyHosts&#x3D;*.xyz.com</span><br><span class="line">-Dhttps.nonProxyHosts&#x3D;*.xyz.com</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p><strong>至此，squid代理web服务器访问外网成功！</strong><br> [1532507559275]: data:image/png;base64,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<br> [1532507600937]: data:image/png;base64,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</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/03/04/squid_proxy/" data-id="ckdegxsu20034iscs38e9dre6" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/" rel="tag">linux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%AD%A3%E5%90%91%E4%BB%A3%E7%90%86/" rel="tag">正向代理</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2020/03/05/sql_trace%E5%92%8C10046/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          sql trace 和 10046 event
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2020/03/04/oracle%20incarnation%E7%90%86%E8%A7%A3/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">oracle incarnation 理解（RMAN - 20207）</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/centos6/">centos6</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/oracle/">oracle</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/oracle-12c-rac/">oracle 12c rac</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/oracle12c/">oracle12c</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/postgrepsql/">postgrepsql</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/windows/">windows</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/11g/" rel="tag">11g</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/GoldenGate/" rel="tag">GoldenGate</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bios/" rel="tag">bios</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/block/" rel="tag">block</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/broker/" rel="tag">broker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cas/" rel="tag">cas</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/centos/" rel="tag">centos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/centos6/" rel="tag">centos6</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/clone/" rel="tag">clone</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/data-guard/" rel="tag">data guard</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/database/" rel="tag">database</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/duplicate/" rel="tag">duplicate</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/event/" rel="tag">event</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flashback/" rel="tag">flashback</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/" rel="tag">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/githup/" rel="tag">githup</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/" rel="tag">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/incarnation/" rel="tag">incarnation</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/" rel="tag">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/oracle/" rel="tag">oracle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/oracle12c/" rel="tag">oracle12c</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdb/" rel="tag">pdb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pg10/" rel="tag">pg10</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/postgrepsql/" rel="tag">postgrepsql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rac/" rel="tag">rac</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/refresh/" rel="tag">refresh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rman/" rel="tag">rman</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql-trace/" rel="tag">sql_trace</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/unison/" rel="tag">unison</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%B8%BB%E6%9D%BF/" rel="tag">主板</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%AD%A3%E5%90%91%E4%BB%A3%E7%90%86/" rel="tag">正向代理</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/11g/" style="font-size: 15px;">11g</a> <a href="/tags/GoldenGate/" style="font-size: 15px;">GoldenGate</a> <a href="/tags/bios/" style="font-size: 10px;">bios</a> <a href="/tags/block/" style="font-size: 10px;">block</a> <a href="/tags/broker/" style="font-size: 10px;">broker</a> <a href="/tags/cas/" style="font-size: 10px;">cas</a> <a href="/tags/centos/" style="font-size: 15px;">centos</a> <a href="/tags/centos6/" style="font-size: 17.5px;">centos6</a> <a href="/tags/clone/" style="font-size: 10px;">clone</a> <a href="/tags/data-guard/" style="font-size: 12.5px;">data guard</a> <a href="/tags/database/" style="font-size: 10px;">database</a> <a href="/tags/duplicate/" style="font-size: 15px;">duplicate</a> <a href="/tags/event/" style="font-size: 10px;">event</a> <a href="/tags/flashback/" style="font-size: 10px;">flashback</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/githup/" style="font-size: 10px;">githup</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/incarnation/" style="font-size: 10px;">incarnation</a> <a href="/tags/linux/" style="font-size: 12.5px;">linux</a> <a href="/tags/oracle/" style="font-size: 20px;">oracle</a> <a href="/tags/oracle12c/" style="font-size: 10px;">oracle12c</a> <a href="/tags/pdb/" style="font-size: 10px;">pdb</a> <a href="/tags/pg10/" style="font-size: 10px;">pg10</a> <a href="/tags/postgrepsql/" style="font-size: 10px;">postgrepsql</a> <a href="/tags/rac/" style="font-size: 10px;">rac</a> <a href="/tags/refresh/" style="font-size: 10px;">refresh</a> <a href="/tags/rman/" style="font-size: 12.5px;">rman</a> <a href="/tags/sql-trace/" style="font-size: 10px;">sql_trace</a> <a href="/tags/unison/" style="font-size: 10px;">unison</a> <a href="/tags/%E4%B8%BB%E6%9D%BF/" style="font-size: 10px;">主板</a> <a href="/tags/%E6%AD%A3%E5%90%91%E4%BB%A3%E7%90%86/" style="font-size: 10px;">正向代理</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">August 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">May 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">March 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">August 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/08/03/postgresql-%E5%90%8C%E6%9C%BA%E7%89%A9%E7%90%86%E5%BC%82%E6%AD%A5%E4%B8%BB%E5%A4%87%E5%BA%93%E6%90%AD%E5%BB%BA/">postgresql-同机物理异步主备库搭建</a>
+          </li>
+        
+          <li>
+            <a href="/2020/08/03/12.2.0_RAC_ORACLE_HOME_chmod%E5%92%8Cchown%E6%83%A8%E6%A1%88%E6%81%A2%E5%A4%8D%E4%B8%80%E4%BE%8B/">12.2.0 RAC ORACLE_HOME chmod/chown惨案恢复一例</a>
+          </li>
+        
+          <li>
+            <a href="/2020/08/03/data_guard_broker_%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/">data guard broker 简单使用</a>
+          </li>
+        
+          <li>
+            <a href="/2020/08/03/duplicate%E5%9F%BA%E4%BA%8Eactive%E6%BA%90%E5%BA%93%E5%A4%8D%E5%88%B6%E6%95%B0%E6%8D%AE%E5%BA%93/">duplicate db from active database/duplicate复制数据库</a>
+          </li>
+        
+          <li>
+            <a href="/2020/08/03/duplicate%E5%9F%BA%E4%BA%8E%E6%BA%90%E5%BA%93rman%E5%A4%87%E4%BB%BD%E5%A4%8D%E5%88%B6%E6%95%B0%E6%8D%AE%E5%BA%93/">duplicate db from rman backup/duplicate复制数据库</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2020 姚刚<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+  
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>hexo+githup 个人博客搭建 | 自律自由</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="闲话优点：  快速高效 支持markdown 布局自定义简单，无广告 部署简单   因为想开始写博客，但又找不到好的博客平台，平时都看博客园和开源中国看博客文章，但博客园的那个皮肤是真有点难受，所以就想自己打个博客平台用着，然后blog的话还是发表到博客园，博客园叫 姚刚，有兴趣的关注一下，以后会出一些关于运维和oracle的文章  **本次环境：个人笔记本+centos6.9 + node.js">
+<meta property="og:type" content="article">
+<meta property="og:title" content="hexo+githup 个人博客搭建">
+<meta property="og:url" content="http://yoursite.com/2020/08/03/hexo_deploy/index.html">
+<meta property="og:site_name" content="自律自由">
+<meta property="og:description" content="闲话优点：  快速高效 支持markdown 布局自定义简单，无广告 部署简单   因为想开始写博客，但又找不到好的博客平台，平时都看博客园和开源中国看博客文章，但博客园的那个皮肤是真有点难受，所以就想自己打个博客平台用着，然后blog的话还是发表到博客园，博客园叫 姚刚，有兴趣的关注一下，以后会出一些关于运维和oracle的文章  **本次环境：个人笔记本+centos6.9 + node.js">
+<meta property="og:locale">
+<meta property="article:published_time" content="2020-08-03T12:06:59.043Z">
+<meta property="article:modified_time" content="2020-08-03T12:06:59.043Z">
+<meta property="article:author" content="姚刚">
+<meta property="article:tag" content="centos6">
+<meta property="article:tag" content="hexo">
+<meta property="article:tag" content="githup">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="自律自由" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 5.0.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">自律自由</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-hexo_deploy" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/08/03/hexo_deploy/" class="article-date">
+  <time datetime="2020-08-03T12:06:59.043Z" itemprop="datePublished">2020-08-03</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/centos6/">centos6</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      hexo+githup 个人博客搭建
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="闲话"><a href="#闲话" class="headerlink" title="闲话"></a>闲话</h2><p><strong>优点：</strong></p>
+<ul>
+<li>快速高效</li>
+<li>支持markdown</li>
+<li>布局自定义简单，无广告</li>
+<li>部署简单</li>
+</ul>
+<hr>
+<p><em>因为想开始写博客，但又找不到好的博客平台，平时都看博客园和开源中国看博客文章，但博客园的那个皮肤是真有点难受，所以就想自己打个博客平台用着，然后blog的话还是发表到博客园，博客园叫 姚刚，有兴趣的关注一下，以后会出一些关于运维和oracle的文章</em></p>
+<hr>
+<p>**本次环境：<br>个人笔记本+centos6.9 + node.js v8.9.4 + theme（NexT.Mist v5.1.4）+ githup + gitment **</p>
+<blockquote>
+<p>因为第一次开始搭建，主要记录一下操作步骤，可能对原理和其他分析不太全面，请原谅，有不当的或错误的见解希望指正。反正博客刚开始也没有访问量，所以就不打算购买域名，将个人博客部署到githup就好。</p>
+</blockquote>
+<h2 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h2><h3 id="安装git"><a href="#安装git" class="headerlink" title="安装git"></a>安装git</h3><p><strong>先安装git 或者node.js都行</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">#直接yum进行安装、</span><br><span class="line">yum -y install git-core</span><br><span class="line">#初始化</span><br><span class="line">git config --global user.name &quot;yao gang&quot;</span><br><span class="line">git config --global user.email &quot;xxx@qq.com&quot;</span><br></pre></td></tr></table></figure>
+<h3 id="安装node-js"><a href="#安装node-js" class="headerlink" title="安装node.js"></a>安装node.js</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">#下载适合自己平台的进行解压：https:&#x2F;&#x2F;nodejs.org&#x2F;zh-cn&#x2F;download&#x2F;</span><br><span class="line">#我装了minimal版，下载node.js源码进行编译安装，开始报错，没有gcc g++</span><br><span class="line">yum -y install gcc gcc-c++    #注意是 gcc-c++ 而不是 g++</span><br><span class="line">#开始编译</span><br><span class="line">.&#x2F;configure --prefix&#x3D;&#x2F;usr&#x2F;local&#x2F;node.js.8.9.4</span><br><span class="line">#报警告  WARNING: C++ compiler too old, need g++ 4.9.2 or clang++ 3.4 (CXX&#x3D;g++)</span><br><span class="line">#升级c++编译器gcc</span><br><span class="line">#下载源码包进行编译安装 https:&#x2F;&#x2F;ftp.gnu.org&#x2F;gnu&#x2F;gcc&#x2F;</span><br><span class="line">#我下载 4.9.2，因为我怕版本太高其他依赖又可能出问题</span><br><span class="line"></span><br><span class="line">wget http:&#x2F;&#x2F;gcc.skazkaforyou.com&#x2F;releases&#x2F;gcc-4.9.2&#x2F;gcc-4.9.2.tar.gz;</span><br><span class="line">tar -zxvf gcc-4.9.2.tar.gz</span><br><span class="line">cd gcc-4.9.2</span><br><span class="line">mkdir build</span><br><span class="line">cd build</span><br><span class="line">yum install gmp-devel mpfr-devel libmpc-devel</span><br><span class="line">..&#x2F;configure --prefix&#x3D;&#x2F;usr</span><br><span class="line">make &amp;&amp; make install     # 如果期间还出现问题，小的可以忽略，但需要安装成功，否则自行百度解决</span><br><span class="line"></span><br><span class="line">#返回node.js.8.9.4目录下</span><br><span class="line">.&#x2F;configure --prefix&#x3D;&#x2F;usr&#x2F;local&#x2F;node8.9.4</span><br><span class="line">make &amp;&amp; make install       #直到安装成功</span><br></pre></td></tr></table></figure>
+<h3 id="安装hexo"><a href="#安装hexo" class="headerlink" title="安装hexo"></a>安装hexo</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"># 编辑 &#x2F;etc&#x2F;profile (使用vim)</span><br><span class="line">vim &#x2F;etc&#x2F;profile</span><br><span class="line"># 在底部添加 PATH 变量</span><br><span class="line">export PATH&#x3D;$PATH:&#x2F;usr&#x2F;local&#x2F;node8.9.4&#x2F;bin</span><br><span class="line"># 保存退出，先按exit键，再按shift+：</span><br><span class="line">wq</span><br><span class="line"># 最后保存并使其生效即可</span><br><span class="line">source &#x2F;etc&#x2F;profile</span><br><span class="line"># 执行命令有输出即代表安装和环境配置成功</span><br><span class="line">node --version  #  v8.9.4</span><br></pre></td></tr></table></figure>
+<h3 id="配置hexo"><a href="#配置hexo" class="headerlink" title="配置hexo"></a>配置hexo</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"># 创建目录</span><br><span class="line">mkdir blog</span><br><span class="line"># 切换目录</span><br><span class="line">cd blog</span><br><span class="line"># 安装 Hexo</span><br><span class="line">npm install -g hexo-cli</span><br><span class="line"># 查看</span><br><span class="line">执行命令：  hexo version # 有输出：</span><br><span class="line">hexo-cli: 1.0.4</span><br><span class="line">os: Linux 2.6.32-696.el6.x86_64 linux x64</span><br><span class="line">http_parser: 2.7.0</span><br><span class="line">node: 8.9.4</span><br><span class="line">v8: 6.1.534.50</span><br><span class="line">uv: 1.15.0</span><br><span class="line">zlib: 1.2.11</span><br><span class="line">ares: 1.10.1-DEV</span><br><span class="line">modules: 57</span><br><span class="line">nghttp2: 1.25.0</span><br><span class="line">openssl: 1.0.2n</span><br><span class="line">icu: 59.1</span><br><span class="line">unicode: 9.0</span><br><span class="line">cldr: 31.0.1</span><br><span class="line">tz: 2017b</span><br><span class="line"></span><br><span class="line">#安装hexo 插件</span><br><span class="line">npm install hexo-generator-index --save</span><br><span class="line">npm install hexo-generator-archive --save</span><br><span class="line">npm install hexo-generator-category --save</span><br><span class="line">npm install hexo-generator-tag --save</span><br><span class="line">npm install hexo-server --save</span><br><span class="line">npm install hexo-deployer-git --save</span><br><span class="line">npm install hexo-deployer-heroku --save</span><br><span class="line">npm install hexo-deployer-rsync --save</span><br><span class="line">npm install hexo-deployer-openshift --save</span><br><span class="line">npm install hexo-renderer-marked --save</span><br><span class="line">npm install hexo-renderer-stylus --save</span><br><span class="line">npm install hexo-generator-feed --save</span><br><span class="line">npm install hexo-generator-sitemap --save</span><br><span class="line">后面部署会用到 hexo-deployer-git --save，其他的好像不安装也行，我当时使用简单，并没有用到。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 初始化 Hexo</span><br><span class="line">hexo init</span><br><span class="line">ls  # 生成hexo工程： _config.yml  db.json  node_modules  package.json  package-lock.json  public  scaffolds  source  themes</span><br><span class="line"></span><br><span class="line"># _config.yml  hexo的主要配置文件 </span><br><span class="line"># db.json         hexo的文件存储，以后的博客文章文件应该就是存储在这里</span><br><span class="line"># node_modules   node的模块</span><br><span class="line"># package.json      hexo的插件</span><br><span class="line"># package-lock.json  node的相关依赖</span><br><span class="line"># public                  后面部署就是部署这里的文件</span><br><span class="line"># scaffolds             模板文件，可以编译下面的模板供后续使用,post、page 和 draft,默认是post</span><br><span class="line"># source          使用hexo命令写作的博客页面都是在这下面，可以手动拷贝到此路劲下指定位置</span><br><span class="line"># themes         hexo的主题配置文件</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>这里介绍几个hexo命令</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">hexo init   # 在当前路劲初始化hexo博客框架工程</span><br><span class="line">hexo generate&#x2F;hexo g  # 后面是简写，讲hexo的 .md 博客文件通过 node.js 渲染生成静态页面</span><br><span class="line"> hexo deploy&#x2F;hexo d # 将生成到public下面的静态文件部署到xx&#x2F;blog&#x2F;_config.yml 指定的地方，待会我会配置为githup的一个用户名仓库，省的购买域名，需要安装git部署插件</span><br><span class="line">hexo server&#x2F;hexo s # 启动hexo服务器，访问入口http:&#x2F;&#x2F;localhost:4000（注意防火墙）</span><br><span class="line">hexo clean # 删除上面的db.json数据存储文件</span><br><span class="line">hexo d -g # 先生成，接着部署到制定位置</span><br><span class="line">hexo s -g # 先生成，接着在本地启动服务器</span><br><span class="line">hexo new &quot;我的hexo博客文章1&quot;  # 这就是博客的文章内容</span><br><span class="line">hexo new page &quot;测试页面1&quot; # hexo new page &quot;categories&quot; hexo new page &quot;categories&quot;(主要用到这2个页面，当然你可以在丰富一些，这两个页面主要是用来做博客菜单按钮的跳转页面使用的)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>这部分有点杂乱，但也是为了给新手说明一下配置文件，也可以看官网文档 <a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/docs/">https://hexo.io/zh-cn/docs/</a></p>
+</blockquote>
+<p>上面我们初始化以后，执行 hexo s -g 会在public里面按默认的post布局生成静态的html、css、js等文件，访问 localhost：4000，即可看到原生最简单的hexo主页了。ctrol + c关闭服务器。</p>
+<blockquote>
+<p>到这里，我们的hexo服务器已经基本完成，是不是很简单呢？如果你购买了域名的话，再设置一下喜欢的主题，就完成了。</p>
+</blockquote>
+<h3 id="配置github"><a href="#配置github" class="headerlink" title="配置github"></a>配置github</h3><p><em>由于我的博客没有人气，所以舍不得买域名，就把它部署到github，使用它的用户域名吧，虽然在国外，其实速度也还好啦。你可以点击<a target="_blank" rel="noopener" href="https://hd-yaogang.github.io/" title="我的博客">我的博客</a>试试，可能你要翻墙才能访问</em></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"># 首先，需要注册github，然后创建仓库，仓库名需要 重点 注意一下： 用户名 + .github.io</span><br><span class="line"># 例子：我的仓库名为： hd-yaogang.github.io 我的用户名是 ：hd-yaogang</span><br><span class="line"># 以后你的博客域名就是 xxx.github.io，我的就是 hd-yaogang.github.io</span><br><span class="line"></span><br><span class="line">#设置hexo所在服务器可以使用git免密ssh部署到 github</span><br><span class="line">#在hexo服务器生成rsa免密私钥和公钥</span><br><span class="line">ssh-keygen  -t  rsa # 一直回车即可，然后执行命令</span><br><span class="line">cat &#x2F;root&#x2F;.ssh&#x2F;id_rsa.pub # 将输出的ssh-rsa到结束的一段内容，将这段内容保存到github</span><br><span class="line"></span><br><span class="line">点进进入github仓库，再依次点击 settings--&gt;Deploy keys--&gt;add deploy key，然后随意设置key名字，将 &#x2F;root&#x2F;.ssh&#x2F;id_rsa.pub 的内容粘贴到里面，点击保存完成即可。</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h3 id="部署hexo"><a href="#部署hexo" class="headerlink" title="部署hexo"></a>部署hexo</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"># 首先测试一下git，执行命令</span><br><span class="line">mkdir git_test</span><br><span class="line">cd  git_test</span><br><span class="line">git clone git@git@github.com:hd-yaogang&#x2F;hd-yaogang.github.io.git</span><br><span class="line">默认会克隆主分支master，虽然是空的目录，但是也能验证git是否免密登录了</span><br><span class="line"></span><br><span class="line"># 编辑hexo主要配置文件</span><br><span class="line">[root@yg blog]# vim _config.yml  # 注意你所在位置</span><br><span class="line"># 找到下面，模仿着修改一下，注意type是git，注意：后面 有空格，注意配置文件的属性颜色能提示你对不对</span><br><span class="line"></span><br><span class="line">deploy:</span><br><span class="line">  type: git</span><br><span class="line">  repo: git@github.com:hd-yaogang&#x2F;hd-yaogang.github.io.git</span><br><span class="line">  branch: master</span><br><span class="line">  message: &#39;yg-blog 站点更新:&#123;&#123;now(&quot;YYYY-MM-DD HH&#x2F;mm&#x2F;ss&quot;)&#125;&#125;&#39;</span><br><span class="line"></span><br><span class="line"># 执行命令</span><br><span class="line">hexo new “我的hexo 测试博客1”</span><br><span class="line">hexo s -g # 访问http:&#x2F;&#x2F;localhost:4000</span><br><span class="line"># 然后部署到git</span><br><span class="line">hexo d -g # 访问 https:&#x2F;&#x2F;hd-yaogang.github.io ，已经显示博客了</span><br></pre></td></tr></table></figure>
+<h3 id="配置hexo-theme"><a href="#配置hexo-theme" class="headerlink" title="配置hexo theme"></a>配置hexo theme</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@yg blog]# git clone --branch v5.1.2 https:&#x2F;&#x2F;github.com&#x2F;iissnan&#x2F;hexo-theme-next themes&#x2F;next</span><br><span class="line"># 下载next主题，也可以自己下载其他喜欢的，放到theme下面即可，这主题不错，后续根据自己需要再改一些</span><br><span class="line"># 启用next主题</span><br><span class="line">[root@yg blog]# vim _config.yml  # 找到theme编辑为：      theme: next</span><br><span class="line"># 重新部署</span><br><span class="line">hexo d -g # 刷新git的博客域名，多刷几次，可能有点慢，主题已经改变的很简洁。</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>主题的细节设置参考，很详细了：<br><a target="_blank" rel="noopener" href="http://theme-next.iissnan.com/theme-settings.html">http://theme-next.iissnan.com/theme-settings.html</a><br><a target="_blank" rel="noopener" href="http://www.jeyzhang.com/next-theme-personal-settings.html">http://www.jeyzhang.com/next-theme-personal-settings.html</a><br><a target="_blank" rel="noopener" href="http://shenzekun.cn/hexo%E7%9A%84next%E4%B8%BB%E9%A2%98%E4%B8%AA%E6%80%A7%E5%8C%96%E9%85%8D%E7%BD%AE%E6%95%99%E7%A8%8B.html">http://shenzekun.cn/hexo%E7%9A%84next%E4%B8%BB%E9%A2%98%E4%B8%AA%E6%80%A7%E5%8C%96%E9%85%8D%E7%BD%AE%E6%95%99%E7%A8%8B.html</a><br><a target="_blank" rel="noopener" href="http://michael728.github.io/2015/11/30/hexo-next-optimize/">http://michael728.github.io/2015/11/30/hexo-next-optimize/</a></p>
+</blockquote>
+<h3 id="配置gitment"><a href="#配置gitment" class="headerlink" title="配置gitment"></a>配置gitment</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo有很多评论插件，当时也没多研究，就直接上了gitment，可能看的教程简单吧，哈哈哈，但是他评论时候需要登录githup，而且刚开始部署时，这个插件时有时无，有时你刷一下博客评论就不见了。样式的话还不错，可以看我博客评论的样子 https:&#x2F;&#x2F;hd-yaogang.github.io</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">首先到github登录，然后依次点击--&gt;账户--&gt;settings--&gt;Developer settings--&gt;New Aouth App，名字叫 Gitment ，homeURL和AuthorizationURL都填写你的域名：https:&#x2F;&#x2F;hd-yaogang.github.io，后面会生成 client ID和 Client Secret，需要配置到hexo的主题配置文件中</span><br><span class="line"></span><br><span class="line">然后创建一个空的仓库，名字是：gitment-comments</span><br><span class="line">然后编辑主题配置文件：# 修改相应的，其余的和空着的不用管</span><br><span class="line"></span><br><span class="line">gitment:</span><br><span class="line">  enable: true</span><br><span class="line">  mint: true </span><br><span class="line">  count: true </span><br><span class="line">  lazy: false</span><br><span class="line">  cleanly: false</span><br><span class="line">  language: zh-Hans # 这是指定插件为中文</span><br><span class="line">  github_user: hd-yaogang  # 这是github用户名</span><br><span class="line">  github_repo: gitment-comments  # 这是空的仓库名，用来存储评论内容</span><br><span class="line">  client_id: cc592528b859ff59a848  # 这是创建app时的id</span><br><span class="line">  client_secret: 80fe54cd8f5f7d58997cc268e376e1552c7020c7 # 这是创建app时的秘钥</span><br><span class="line">  proxy_gateway: </span><br><span class="line">  redirect_protocol: </span><br><span class="line"></span><br><span class="line"># 再次部署</span><br><span class="line">hexo  d  -g</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><p><strong>由于每个人能力与想法、环境各都不同，所以可能嫌我写的差，写的啰嗦，写的不好<br>但是慢慢来，希望有错误的话帮忙指出，谢谢！</strong></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/08/03/hexo_deploy/" data-id="ckdegxssy0006iscshl423j41" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/centos6/" rel="tag">centos6</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/githup/" rel="tag">githup</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/hexo/" rel="tag">hexo</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2020/08/03/duplicate%E5%9F%BA%E4%BA%8E%E6%BA%90%E5%BA%93rman%E5%A4%87%E4%BB%BD%E5%A4%8D%E5%88%B6%E6%95%B0%E6%8D%AE%E5%BA%93/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          duplicate db from rman backup/duplicate复制数据库
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2020/08/03/mysql%E5%90%8C%E6%9C%BA%E5%8F%8C%E5%AE%9E%E4%BE%8B%E7%AE%80%E5%8D%95%E9%85%8D%E7%BD%AE/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title"></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/centos6/">centos6</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/oracle/">oracle</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/oracle-12c-rac/">oracle 12c rac</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/oracle12c/">oracle12c</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/postgrepsql/">postgrepsql</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/windows/">windows</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/11g/" rel="tag">11g</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/GoldenGate/" rel="tag">GoldenGate</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bios/" rel="tag">bios</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/block/" rel="tag">block</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/broker/" rel="tag">broker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cas/" rel="tag">cas</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/centos/" rel="tag">centos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/centos6/" rel="tag">centos6</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/clone/" rel="tag">clone</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/data-guard/" rel="tag">data guard</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/database/" rel="tag">database</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/duplicate/" rel="tag">duplicate</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/event/" rel="tag">event</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flashback/" rel="tag">flashback</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/" rel="tag">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/githup/" rel="tag">githup</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/" rel="tag">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/incarnation/" rel="tag">incarnation</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/" rel="tag">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/oracle/" rel="tag">oracle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/oracle12c/" rel="tag">oracle12c</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdb/" rel="tag">pdb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pg10/" rel="tag">pg10</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/postgrepsql/" rel="tag">postgrepsql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rac/" rel="tag">rac</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/refresh/" rel="tag">refresh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rman/" rel="tag">rman</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sql-trace/" rel="tag">sql_trace</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/unison/" rel="tag">unison</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%B8%BB%E6%9D%BF/" rel="tag">主板</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%AD%A3%E5%90%91%E4%BB%A3%E7%90%86/" rel="tag">正向代理</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/11g/" style="font-size: 15px;">11g</a> <a href="/tags/GoldenGate/" style="font-size: 15px;">GoldenGate</a> <a href="/tags/bios/" style="font-size: 10px;">bios</a> <a href="/tags/block/" style="font-size: 10px;">block</a> <a href="/tags/broker/" style="font-size: 10px;">broker</a> <a href="/tags/cas/" style="font-size: 10px;">cas</a> <a href="/tags/centos/" style="font-size: 15px;">centos</a> <a href="/tags/centos6/" style="font-size: 17.5px;">centos6</a> <a href="/tags/clone/" style="font-size: 10px;">clone</a> <a href="/tags/data-guard/" style="font-size: 12.5px;">data guard</a> <a href="/tags/database/" style="font-size: 10px;">database</a> <a href="/tags/duplicate/" style="font-size: 15px;">duplicate</a> <a href="/tags/event/" style="font-size: 10px;">event</a> <a href="/tags/flashback/" style="font-size: 10px;">flashback</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/githup/" style="font-size: 10px;">githup</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/incarnation/" style="font-size: 10px;">incarnation</a> <a href="/tags/linux/" style="font-size: 12.5px;">linux</a> <a href="/tags/oracle/" style="font-size: 20px;">oracle</a> <a href="/tags/oracle12c/" style="font-size: 10px;">oracle12c</a> <a href="/tags/pdb/" style="font-size: 10px;">pdb</a> <a href="/tags/pg10/" style="font-size: 10px;">pg10</a> <a href="/tags/postgrepsql/" style="font-size: 10px;">postgrepsql</a> <a href="/tags/rac/" style="font-size: 10px;">rac</a> <a href="/tags/refresh/" style="font-size: 10px;">refresh</a> <a href="/tags/rman/" style="font-size: 12.5px;">rman</a> <a href="/tags/sql-trace/" style="font-size: 10px;">sql_trace</a> <a href="/tags/unison/" style="font-size: 10px;">unison</a> <a href="/tags/%E4%B8%BB%E6%9D%BF/" style="font-size: 10px;">主板</a> <a href="/tags/%E6%AD%A3%E5%90%91%E4%BB%A3%E7%90%86/" style="font-size: 10px;">正向代理</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">August 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">May 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">March 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">August 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/08/03/postgresql-%E5%90%8C%E6%9C%BA%E7%89%A9%E7%90%86%E5%BC%82%E6%AD%A5%E4%B8%BB%E5%A4%87%E5%BA%93%E6%90%AD%E5%BB%BA/">postgresql-同机物理异步主备库搭建</a>
+          </li>
+        
+          <li>
+            <a href="/2020/08/03/12.2.0_RAC_ORACLE_HOME_chmod%E5%92%8Cchown%E6%83%A8%E6%A1%88%E6%81%A2%E5%A4%8D%E4%B8%80%E4%BE%8B/">12.2.0 RAC ORACLE_HOME chmod/chown惨案恢复一例</a>
+          </li>
+        
+          <li>
+            <a href="/2020/08/03/data_guard_broker_%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/">data guard broker 简单使用</a>
+          </li>
+        
+          <li>
+            <a href="/2020/08/03/duplicate%E5%9F%BA%E4%BA%8Eactive%E6%BA%90%E5%BA%93%E5%A4%8D%E5%88%B6%E6%95%B0%E6%8D%AE%E5%BA%93/">duplicate db from active database/duplicate复制数据库</a>
+          </li>
+        
+          <li>
+            <a href="/2020/08/03/duplicate%E5%9F%BA%E4%BA%8E%E6%BA%90%E5%BA%93rman%E5%A4%87%E4%BB%BD%E5%A4%8D%E5%88%B6%E6%95%B0%E6%8D%AE%E5%BA%93/">duplicate db from rman backup/duplicate复制数据库</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2020 姚刚<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+  
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+  </div>
+</body>
+</html>
