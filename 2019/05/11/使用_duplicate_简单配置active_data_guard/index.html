@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="12345data guard分为物理和逻辑备库:a:  物理standby是redo应用，可以mount和open read only，也可以通过停止应用，保存快照作为还原点，然后打开为读写模式，standby和primary的版本需要一致，redo应用又可以使用lgwr和arch进程使用2种，sync和async2种，affirm和noaffirm 2种，保护模式共有3种：最大性能，最大可用，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="oracle 11.2.0.4.0 使用 duplicate 配置 data guard">
+<meta property="og:url" content="http://yoursite.com/2019/05/11/%E4%BD%BF%E7%94%A8_duplicate_%E7%AE%80%E5%8D%95%E9%85%8D%E7%BD%AEactive_data_guard/index.html">
+<meta property="og:site_name" content="自律自由">
+<meta property="og:description" content="12345data guard分为物理和逻辑备库:a:  物理standby是redo应用，可以mount和open read only，也可以通过停止应用，保存快照作为还原点，然后打开为读写模式，standby和primary的版本需要一致，redo应用又可以使用lgwr和arch进程使用2种，sync和async2种，affirm和noaffirm 2种，保护模式共有3种：最大性能，最大可用，">
+<meta property="og:locale">
+<meta property="article:published_time" content="2019-05-11T23:00:00.000Z">
+<meta property="article:modified_time" content="2020-08-04T02:24:02.656Z">
+<meta property="article:author" content="姚刚">
+<meta property="article:tag" content="oracle">
+<meta property="article:tag" content="data guard">
+<meta property="article:tag" content="duplicate">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2019/05/11/%E4%BD%BF%E7%94%A8_duplicate_%E7%AE%80%E5%8D%95%E9%85%8D%E7%BD%AEactive_data_guard/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>oracle 11.2.0.4.0 使用 duplicate 配置 data guard | 自律自由</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="自律自由" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">自律自由</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">yaogang</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/11/%E4%BD%BF%E7%94%A8_duplicate_%E7%AE%80%E5%8D%95%E9%85%8D%E7%BD%AEactive_data_guard/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="姚刚">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="自律自由">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          oracle 11.2.0.4.0 使用 duplicate 配置 data guard
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-05-11 23:00:00" itemprop="dateCreated datePublished" datetime="2019-05-11T23:00:00+00:00">2019-05-11</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-08-04 02:24:02" itemprop="dateModified" datetime="2020-08-04T02:24:02+00:00">2020-08-04</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/oracle/" itemprop="url" rel="index"><span itemprop="name">oracle</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">data guard分为物理和逻辑备库:</span><br><span class="line"></span><br><span class="line">a:  物理standby是redo应用，可以mount和open read only，也可以通过停止应用，保存快照作为还原点，然后打开为读写模式，standby和primary的版本需要一致，redo应用又可以使用lgwr和arch进程使用2种，sync和async2种，affirm和noaffirm 2种，保护模式共有3种：最大性能，最大可用，最大保护</span><br><span class="line"></span><br><span class="line">b:  逻辑standby是sql应用，所以standby一定是open的，standby和primary库版本可能不需要强一致性</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">注意：主库和备库的 sid, db_name 一样, db_unique_name 不一样, 一般情况下 oracle_sid&#x3D;dn_name&#x3D;db_unique_name</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">环境信息：</span><br><span class="line"></span><br><span class="line">db_version&#x3D;Oracle Database 11g Enterprise Edition Release 11.2.0.4.0 - 64bit Production</span><br><span class="line">os_version&#x3D;CentOS Linux release 7.6.1810 (Core)</span><br><span class="line">primary_db_name&#x3D;SRM</span><br><span class="line">standby_db_name&#x3D;SRM</span><br><span class="line">primary_db_unique_name&#x3D;SRMDG</span><br><span class="line">standby_db_unique_name&#x3D;SRMDG</span><br></pre></td></tr></table></figure>
+<p>###主库操作</p>
+<p><strong>1. 启动强制日志，强制nologging的操作写redo</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">alter database force logging;</span><br></pre></td></tr></table></figure>
+<p><strong>2. 增加主库standby redo log，目的主要是switchover后，主库作为备库时接收接收主库的redo</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">-- standby logfile一般主要由rfs(remote file server 前台进程)接收主库的redo，然后进行应用，当主库归档redo后，备库就相应的归档standby logfile</span><br><span class="line">-- 所以standby logfile要大于主库redo file，oracle推荐一样大，数量的话也是至少一样多</span><br><span class="line">-- 要注意rac主库的话要结合 v$log 和 v$thread 来，单主库rac添加节点实例或者redo文件时，每个standby库都需要相应添加standby logfile，否则可能会备库不同步</span><br><span class="line">-- 当备库的standby不可用或者有redo gap时，备库收到的redo可能直接写到备库的LOCATION位置</span><br><span class="line"></span><br><span class="line">--单实例库</span><br><span class="line">set line 200</span><br><span class="line">col member for a100</span><br><span class="line">select * from v$logfile;</span><br><span class="line">select group#, bytes&#x2F;1024&#x2F;1024 M from v$log;</span><br><span class="line">alter database add standby logfile &#39;&#x2F;u01&#x2F;app&#x2F;oracle&#x2F;oradata&#x2F;SRM&#x2F;standby_redo01.log&#39; size 100M;</span><br><span class="line">alter database add standby logfile &#39;&#x2F;u01&#x2F;app&#x2F;oracle&#x2F;oradata&#x2F;SRM&#x2F;standby_redo02.log&#39; size 100M;</span><br><span class="line">alter database add standby logfile &#39;&#x2F;u01&#x2F;app&#x2F;oracle&#x2F;oradata&#x2F;SRM&#x2F;standby_redo03.log&#39; size 100M;</span><br><span class="line">alter database add standby logfile &#39;&#x2F;u01&#x2F;app&#x2F;oracle&#x2F;oradata&#x2F;SRM&#x2F;standby_redo04.log&#39; size 100M;</span><br><span class="line"></span><br><span class="line">--如果是rac主库的话需要结合 v$log和 v$thread 来：</span><br><span class="line">--rac 库</span><br><span class="line">--alter database add standby logfile thread 1 SIZE 500M;</span><br><span class="line">--alter database add standby logfile thread 1 SIZE 500M;</span><br><span class="line">--alter database add standby logfile thread 1 SIZE 500M;</span><br><span class="line">--alter database add standby logfile thread 2 SIZE 500M;</span><br><span class="line">--alter database add standby logfile thread 2 SIZE 500M;</span><br><span class="line">--alter database add standby logfile thread 2 SIZE 500M;</span><br></pre></td></tr></table></figure>
+
+<p><strong>3. 配置主库到备库的redo传输</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">--配置log_archive_config和log_archive_dest_n，11g最多30个standby吧好像**</span><br><span class="line">alter system set log_archive_config&#x3D;&#39;dg_config&#x3D;(srm,srmdg)&#39;;</span><br></pre></td></tr></table></figure>
+<p><strong>4. 设置备库redo应用位置</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">--本机使用fra 注意租后db_unique_name指定tns名，这里可以设置redo实时应用或者应用归档</span><br><span class="line">alter system set log_archive_dest_1&#x3D;&#39;location&#x3D;use_db_recovery_file_dest valid_for&#x3D;(all_logfiles,all_roles) db_unique_name&#x3D;srm&#39;;</span><br><span class="line">--归档应用型</span><br><span class="line">alter system set log_archive_dest_2&#x3D;&#39;SERVICE&#x3D;srmdg arch async affirm valid_for&#x3D;(online_logfiles,primary_role) db_unique_name&#x3D;srmdg&#39;;</span><br><span class="line">--日志应用型</span><br><span class="line">--alter system set log_archive_dest_2&#x3D;&#39;SERVICE&#x3D;srmdg LGWR SYNC AFFIRM VALID_FOR&#x3D;(ONLINE_LOGFILES,PRIMARY_ROLE) DB_UNIQUE_NAME&#x3D;srmdg&#39;;</span><br></pre></td></tr></table></figure>
+
+
+<p><strong>5. 启用redo应用1 2 ，默认已经启动</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">alter system set log_archive_dest_state_1&#x3D;enable;</span><br><span class="line">alter system set log_archive_dest_state_2&#x3D;enable;</span><br></pre></td></tr></table></figure>
+
+<p><strong>6. 设置standby file自动管理，默认为manual</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">alter system set standby_file_management&#x3D;&#39;auto&#39;;</span><br></pre></td></tr></table></figure>
+
+<p><strong>7. 设置sys远程登录</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">--检查EXCLUSIVE，一般默认为exclusive ，为none表明不允许sys远程登录，如果值不是EXCLUSIVE，则：</span><br><span class="line">show parameter REMOTE_LOGIN_PASSWORDFILE;</span><br><span class="line">alter system set remote_login_passwordfile&#x3D;exclusive scope&#x3D;spfile; </span><br></pre></td></tr></table></figure>
+
+<p><strong>8. 设置故障转移</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">alter system set fal_server&#x3D;&#39;srmdg&#39;;</span><br><span class="line"></span><br><span class="line">--设置日志和数据文件名称转换，用于主和备库路径不一致情况(注意： 主库在前，备库在后，但是为standby才生效，所以一般是primary配置备库库在前，standby配置主库在前)</span><br><span class="line">alter system set db_file_name_convert&#x3D;&#39;&#x2F;u01&#x2F;app&#x2F;oracle&#x2F;oradata2&#x2F;SRMDG&#x2F;&#39;,&#39;&#x2F;u01&#x2F;app&#x2F;oracle&#x2F;oradata&#x2F;SRM&#39; scope&#x3D;spfile;</span><br><span class="line">alter system set log_file_name_convert&#x3D;&#39;&#x2F;u01&#x2F;app&#x2F;oracle&#x2F;oradata2&#x2F;SRMDG&#x2F;&#39;,&#39;&#x2F;u01&#x2F;app&#x2F;oracle&#x2F;oradata&#x2F;SRM&#39; scope&#x3D;spfile;</span><br></pre></td></tr></table></figure>
+<p><strong>9. 启动主库归档</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">--重启生效静态参数,启动归档(如果已经启用就不用了)</span><br><span class="line">shu immediate</span><br><span class="line">startup mount;</span><br><span class="line">alter database archivelog;</span><br><span class="line">--alter database open;</span><br><span class="line">--archive log list;</span><br></pre></td></tr></table></figure>
+
+<p><strong>10. 配置主库tns</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">--注意主备库都要配置2个，不然主库发送redo找不到备库位置</span><br><span class="line">---------------------------------------------------------------------------------------</span><br><span class="line">SRM &#x3D;</span><br><span class="line">  (DESCRIPTION &#x3D;</span><br><span class="line">    (ADDRESS &#x3D; (PROTOCOL &#x3D; TCP)(HOST &#x3D; 192.168.100.203)(PORT &#x3D; 1521))</span><br><span class="line">    (CONNECT_DATA &#x3D;</span><br><span class="line">      (SERVER &#x3D; DEDICATED)</span><br><span class="line">      (SERVICE_NAME &#x3D; SRM)</span><br><span class="line">    )</span><br><span class="line">  )</span><br><span class="line">SRMDG &#x3D;</span><br><span class="line">  (DESCRIPTION &#x3D;</span><br><span class="line">    (ADDRESS &#x3D; (PROTOCOL &#x3D; TCP)(HOST &#x3D; 192.168.100.204)(PORT &#x3D; 1521))</span><br><span class="line">    (CONNECT_DATA &#x3D;</span><br><span class="line">      (SERVER &#x3D; DEDICATED)</span><br><span class="line">      (SERVICE_NAME &#x3D; SRMDG)</span><br><span class="line">    )</span><br><span class="line">  )</span><br><span class="line">---------------------------------------------------------------------------------------</span><br></pre></td></tr></table></figure>
+
+<p><strong>11. 建测试表，插入一条测试数据</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">create table yg(id int);</span><br><span class="line">insert into yg values(1);</span><br><span class="line">commit;</span><br></pre></td></tr></table></figure>
+
+<p>###备库操作</p>
+<p><strong>1. 配置静态监听</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">---千万注意静态监听一定要注意环境变量ORACLE_SID和监听文件中配置的大小写要一致</span><br><span class="line">[oracle@localhost admin]$ lsnrctl stop</span><br><span class="line">[oracle@localhost admin]$ vim listener.ora</span><br><span class="line">---------------------------------------------------------------------------------------</span><br><span class="line">LISTENER&#x3D;</span><br><span class="line">  (DESCRIPTION&#x3D;</span><br><span class="line">    (ADDRESS_LIST&#x3D;</span><br><span class="line">      (ADDRESS&#x3D;(PROTOCOL&#x3D;tcp)(HOST&#x3D;192.168.100.204)(PORT&#x3D;1521))</span><br><span class="line">      (ADDRESS&#x3D;(PROTOCOL&#x3D;ipc)(KEY&#x3D;extproc))))</span><br><span class="line">SID_LIST_LISTENER&#x3D;</span><br><span class="line">  (SID_LIST&#x3D;</span><br><span class="line">    (SID_DESC&#x3D;</span><br><span class="line">      (GLOBAL_DBNAME&#x3D;SRMDG)</span><br><span class="line">      (ORACLE_HOME&#x3D;&#x2F;u01&#x2F;app&#x2F;oracle&#x2F;product&#x2F;11.2.0&#x2F;dbhome_1)</span><br><span class="line">      (SID_NAME&#x3D;SRMDG))</span><br><span class="line">  )</span><br><span class="line">---------------------------------------------------------------------------------------</span><br><span class="line"></span><br><span class="line">-- 重启静态监听**</span><br><span class="line">[oracle@localhost admin]$ lsnrctl start</span><br></pre></td></tr></table></figure>
+
+<p><strong>2. 添加备库tns配置</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">--注意主备都加，不然switchover测试时备库发送redo根据tns找不到原来主库的位置</span><br><span class="line">[oracle@localhost admin]$ vim tnsnames.ora</span><br><span class="line">---------------------------------------------------------------------------------------</span><br><span class="line">SRM &#x3D;</span><br><span class="line">  (DESCRIPTION &#x3D;</span><br><span class="line">    (ADDRESS &#x3D; (PROTOCOL &#x3D; TCP)(HOST &#x3D; 192.168.100.203)(PORT &#x3D; 1521))</span><br><span class="line">    (CONNECT_DATA &#x3D;</span><br><span class="line">      (SERVER &#x3D; DEDICATED)</span><br><span class="line">      (SERVICE_NAME &#x3D; SRM)</span><br><span class="line">    )</span><br><span class="line">  )</span><br><span class="line">SRMDG &#x3D;</span><br><span class="line">  (DESCRIPTION &#x3D;</span><br><span class="line">    (ADDRESS &#x3D; (PROTOCOL &#x3D; TCP)(HOST &#x3D; 192.168.100.204)(PORT &#x3D; 1521))</span><br><span class="line">    (CONNECT_DATA &#x3D;</span><br><span class="line">      (SERVER &#x3D; DEDICATED)</span><br><span class="line">      (SERVICE_NAME &#x3D; SRMDG)</span><br><span class="line">    )</span><br><span class="line">  )</span><br><span class="line">---------------------------------------------------------------------------------------</span><br></pre></td></tr></table></figure>
+
+<p><strong>3. 配置密码文件</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">--复制主库password文件到备库，复制和新建都行，密码应该可以不一样，因为duplicate都会帮你再覆盖一次，如果rman恢复的话要一样</span><br><span class="line">[oracle@localhost dbs]$ scp primary:&#x2F;u01&#x2F;app&#x2F;oracle&#x2F;product&#x2F;11.2.0&#x2F;dbhome_1&#x2F;dbs&#x2F;orapwSRM orapwSRMDG</span><br></pre></td></tr></table></figure>
+
+<p><strong>4. 新建standby参数文件</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">-- 指定一个和备库的db_name就行了，也许可以不用，自己有兴趣可以验证</span><br><span class="line">[oracle@localhost ~]$ cd</span><br><span class="line">cat &gt;&gt; temp_pfile.ora &lt;&lt;EOF</span><br><span class="line">*.db_name&#x3D;&#39;SRM&#39;</span><br><span class="line">EOF</span><br></pre></td></tr></table></figure>
+
+<p><strong>5. 修改 standby SID</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[oracle@localhost ~]$ export ORACLE_SID&#x3D;SRMDG</span><br><span class="line">[oracle@localhost ~]$ echo $ORACLE_SID</span><br><span class="line">SRMDG</span><br></pre></td></tr></table></figure>
+<p><strong>6. 启动standby实例</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[oracle@localhost ~]$ sqlplus &#x2F; as sysdba</span><br><span class="line">SQL&gt;  startup nomount pfile&#x3D;&#39;&#x2F;home&#x2F;oracle&#x2F;temp_pfile.ora&#39;;</span><br></pre></td></tr></table></figure>
+
+<p><strong>7. 测试standby远程sys登录, 可以正常登录，不能为idle状态，否则检查密码文件和SID和监听SID大小写问题</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[oracle@localhost ~]$ sqlplus sys&#x2F;oracle@srmdg as sysdba </span><br></pre></td></tr></table></figure>
+
+<p><strong>8. 创建standby相应目录</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p &#x2F;u01&#x2F;app&#x2F;oracle&#x2F;oradata2&#x2F;SRMDG&#x2F;</span><br><span class="line">mkdir -p &#x2F;u01&#x2F;app&#x2F;oracle&#x2F;fast_recovery_area&#x2F;SRMDG</span><br></pre></td></tr></table></figure>
+
+<p><strong>9. 开始duplicate standby库</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">--在主库或者备库操作都行，都以sys登录rma，一定要登录target库，准备开始搭建standby库，channel配置使用target库</span><br><span class="line">[oracle@localhost ~]$ rman target sys&#x2F;oracle@srm</span><br><span class="line"></span><br><span class="line">Recovery Manager: Release 11.2.0.4.0 - Production on Fri Apr 19 07:53:36 2019</span><br><span class="line"></span><br><span class="line">Copyright (c) 1982, 2011, Oracle and&#x2F;or its affiliates.  All rights reserved.</span><br><span class="line"></span><br><span class="line">connected to target database: SRM (DBID&#x3D;2040369693)</span><br><span class="line"></span><br><span class="line">RMAN&gt; connect auxiliary sys&#x2F;oracle@srmdg</span><br><span class="line"></span><br><span class="line">connected to auxiliary database: SRM (not mounted)    # 注意这里状态</span><br><span class="line"></span><br><span class="line">--arch型</span><br><span class="line">RMAN&gt;duplicate target database </span><br><span class="line">    for standby </span><br><span class="line">    from active database </span><br><span class="line">    dorecover </span><br><span class="line">    spfile </span><br><span class="line">    set &quot;db_unique_name&quot;&#x3D;&quot;SRMDG&quot; </span><br><span class="line">    set control_files&#x3D;&quot;&#x2F;u01&#x2F;app&#x2F;oracle&#x2F;oradata2&#x2F;SRMDG&#x2F;control01.ctl&quot;,&quot;&#x2F;u01&#x2F;app&#x2F;oracle&#x2F;oradata2&#x2F;SRMDG&#x2F;control02.ctl&quot; </span><br><span class="line">    set log_archive_dest_1&#x3D;&quot;LOCATION&#x3D;USE_DB_RECOVERY_FILE_DEST VALID_FOR&#x3D;(ALL_LOGFILES,ALL_ROLES) DB_UNIQUE_NAME&#x3D;srmdg&quot; </span><br><span class="line">    set log_archive_dest_2&#x3D;&quot;SERVICE&#x3D;srm arch async affirm VALID_FOR&#x3D;(ONLINE_LOGFILES,PRIMARY_ROLE) DB_UNIQUE_NAME&#x3D;srm&quot; </span><br><span class="line">    set db_file_name_convert&#x3D;&quot;&#x2F;u01&#x2F;app&#x2F;oracle&#x2F;oradata&#x2F;SRM&#x2F;&quot;,&quot;&#x2F;u01&#x2F;app&#x2F;oracle&#x2F;oradata2&#x2F;SRMDG&#x2F;&quot; </span><br><span class="line">    set log_file_name_convert&#x3D;&quot;&#x2F;u01&#x2F;app&#x2F;oracle&#x2F;oradata&#x2F;SRM&#x2F;&quot;,&quot;&#x2F;u01&#x2F;app&#x2F;oracle&#x2F;oradata2&#x2F;SRMDG&#x2F;&quot; </span><br><span class="line">    set fal_server&#x3D;&quot;srm&quot; comment &quot;is primary&quot; </span><br><span class="line">    nofilenamecheck;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">--lgwr型</span><br><span class="line">--duplicate target database </span><br><span class="line">--    for standby </span><br><span class="line">--    from active database </span><br><span class="line">--    dorecover </span><br><span class="line">--    spfile </span><br><span class="line">--    set &quot;db_unique_name&quot;&#x3D;&quot;SRMDG&quot; </span><br><span class="line">--    set control_files&#x3D;&quot;&#x2F;u01&#x2F;app&#x2F;oracle&#x2F;oradata2&#x2F;SRMDG&#x2F;control01.ctl&quot;,&quot;&#x2F;u01&#x2F;app&#x2F;oracle&#x2F;oradata2&#x2F;SRMDG&#x2F;control02.ctl&quot; </span><br><span class="line">--    set log_archive_dest_1&#x3D;&quot;LOCATION&#x3D;USE_DB_RECOVERY_FILE_DEST VALID_FOR&#x3D;(ALL_LOGFILES,ALL_ROLES) DB_UNIQUE_NAME&#x3D;srmdg&quot; </span><br><span class="line">--    set log_archive_dest_2&#x3D;&quot;SERVICE&#x3D;srm lgwr sync affirm VALID_FOR&#x3D;(ONLINE_LOGFILES,PRIMARY_ROLE) DB_UNIQUE_NAME&#x3D;srm&quot; </span><br><span class="line">--    set db_file_name_convert&#x3D;&quot;&#x2F;u01&#x2F;app&#x2F;oracle&#x2F;oradata&#x2F;SRM&#x2F;&quot;,&quot;&#x2F;u01&#x2F;app&#x2F;oracle&#x2F;oradata2&#x2F;SRMDG&#x2F;&quot; </span><br><span class="line">--    set log_file_name_convert&#x3D;&quot;&#x2F;u01&#x2F;app&#x2F;oracle&#x2F;oradata&#x2F;SRM&#x2F;&quot;,&quot;&#x2F;u01&#x2F;app&#x2F;oracle&#x2F;oradata2&#x2F;SRMDG&#x2F;&quot; </span><br><span class="line">--    set fal_server&#x3D;&quot;srm&quot; comment &quot;is primary&quot; </span><br><span class="line">--    nofilenamecheck;</span><br></pre></td></tr></table></figure>
+
+<p><strong>10. 查看备库相关参数</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">set line 200</span><br><span class="line">col OPEN_MODE for a15</span><br><span class="line">col PROTECTION_MODE for a25</span><br><span class="line">col PROTECTION_MODE for a25</span><br><span class="line">col DATABASE_ROLE for a20</span><br><span class="line">col PROTECTION_LEVEL for a25</span><br><span class="line">col LOG_MODE for a15</span><br><span class="line">col name for a15</span><br><span class="line">col SWITCHOVER_STATUS for a20</span><br><span class="line">select DBID,NAME,LOG_MODE,OPEN_MODE,DATABASE_ROLE,SWITCHOVER_STATUS,PROTECTION_MODE,PROTECTION_LEVEL from v$database;</span><br></pre></td></tr></table></figure>
+
+<p><strong>11. 启动备库，开始归档日志应用</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">alter database open;</span><br><span class="line">alter database recover managed standby database disconnect from session;</span><br></pre></td></tr></table></figure>
+
+<p><strong>12. 在备库查询</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">select client_process, process, thread#, sequence#, status from </span><br><span class="line">v$managed_standby where client_process&#x3D;&#39;LGWR&#39; or process&#x3D;&#39;MRP0&#39;;</span><br><span class="line"></span><br><span class="line">--如下所示 注意这是使用arch进程，可能监控不到应用状态</span><br><span class="line">CLIENT_PROCESS           PROCESS                        THREAD#  SEQUENCE# STATUS</span><br><span class="line">------------------------ --------------------------- ---------- ---------- ------------------------------------</span><br><span class="line">N&#x2F;A                      MRP0                                 1         63 WAIT_FOR_LOG</span><br><span class="line"></span><br><span class="line">--如果是使用lgwr进程，查询得到如下接口则证明此次dg搭建应该没问题</span><br><span class="line">CLIENT_PROCESS PROCESS   THREAD#    SEQUENCE#  STATUS</span><br><span class="line">-------------- --------- ---------- ---------- ------------</span><br><span class="line">N&#x2F;A            MRP0      1          80         APPLYING_LOG</span><br><span class="line">LGWR           RFS       1          80         IDLE</span><br></pre></td></tr></table></figure>
+
+<p><strong>13. 数据校验</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">--手动插入主库数据，归档，备库查寻，数据已经插入并归档到到备库</span><br></pre></td></tr></table></figure>
+
+<p><strong>主库查询</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">SQL&gt; select DBID,NAME,LOG_MODE,OPEN_MODE,DATABASE_ROLE,SWITCHOVER_STATUS,PROTECTION_MODE,PROTECTION_LEVEL from v$database;</span><br><span class="line"></span><br><span class="line">      DBID NAME            LOG_MODE        OPEN_MODE       DATABASE_ROLE        SWITCHOVER_STATUS    PROTECTION_MODE           PROTECTION_LEVEL</span><br><span class="line">---------- --------------- --------------- --------------- -------------------- -------------------- ------------------------- -------------------------</span><br><span class="line">2040369693 SRM             ARCHIVELOG      READ WRITE      PRIMARY              TO STANDBY           MAXIMUM PERFORMANCE       MAXIMUM PERFORMANCE</span><br></pre></td></tr></table></figure>
+<p><strong>备库查询</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">SQL&gt; select DBID,NAME,LOG_MODE,OPEN_MODE,DATABASE_ROLE,SWITCHOVER_STATUS,PROTECTION_MODE,PROTECTION_LEVEL from v$database;</span><br><span class="line"></span><br><span class="line">      DBID NAME            LOG_MODE        OPEN_MODE       DATABASE_ROLE        SWITCHOVER_STATUS    PROTECTION_MODE           PROTECTION_LEVEL</span><br><span class="line">---------- --------------- --------------- --------------- -------------------- -------------------- ------------------------- -------------------------</span><br><span class="line">2040369693 SRM             ARCHIVELOG      READ ONLY WITH  PHYSICAL STANDBY     NOT ALLOWED          MAXIMUM PERFORMANCE       MAXIMUM PERFORMANCE</span><br></pre></td></tr></table></figure>
+
+<p><strong>本地 duplicate data guard 至此搭建完毕!</strong></p>
+<p><em>因水平有限，如果有误，欢迎指正，不喜勿喷，喜欢能帮到大家    ^ · ^</em></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/oracle/" rel="tag"># oracle</a>
+              <a href="/tags/data-guard/" rel="tag"># data guard</a>
+              <a href="/tags/duplicate/" rel="tag"># duplicate</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/05/11/duplicate%E5%9F%BA%E4%BA%8Eactive%E6%BA%90%E5%BA%93%E5%A4%8D%E5%88%B6%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="prev" title="duplicate db from active database/duplicate复制数据库">
+      <i class="fa fa-chevron-left"></i> duplicate db from active database/duplicate复制数据库
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/05/11/duplicate%E5%9F%BA%E4%BA%8E%E6%BA%90%E5%BA%93rman%E5%A4%87%E4%BB%BD%E5%A4%8D%E5%88%B6%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="next" title="duplicate db from rman backup/duplicate复制数据库">
+      duplicate db from rman backup/duplicate复制数据库 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">姚刚</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">22</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">categories</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">32</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">姚刚</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

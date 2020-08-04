@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="源库需要开启归档，不需要备份，不会影响源库（当然，一点点clone性能除外） 和 from active database 不同，target可以处于关闭状态，channel使用的是 auxiliary实例的，不能配置 parallelism ，好像速度更快额，因为from active database 是先backup copy 然后在switch ，其实原理和直接拷贝rman备份恢复一样，只">
+<meta property="og:type" content="article">
+<meta property="og:title" content="duplicate db from rman backup&#x2F;duplicate复制数据库">
+<meta property="og:url" content="http://yoursite.com/2019/05/11/duplicate%E5%9F%BA%E4%BA%8E%E6%BA%90%E5%BA%93rman%E5%A4%87%E4%BB%BD%E5%A4%8D%E5%88%B6%E6%95%B0%E6%8D%AE%E5%BA%93/index.html">
+<meta property="og:site_name" content="自律自由">
+<meta property="og:description" content="源库需要开启归档，不需要备份，不会影响源库（当然，一点点clone性能除外） 和 from active database 不同，target可以处于关闭状态，channel使用的是 auxiliary实例的，不能配置 parallelism ，好像速度更快额，因为from active database 是先backup copy 然后在switch ，其实原理和直接拷贝rman备份恢复一样，只">
+<meta property="og:locale">
+<meta property="article:published_time" content="2019-05-11T23:08:00.000Z">
+<meta property="article:modified_time" content="2020-08-04T02:24:02.646Z">
+<meta property="article:author" content="姚刚">
+<meta property="article:tag" content="oracle">
+<meta property="article:tag" content="duplicate">
+<meta property="article:tag" content="rman">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2019/05/11/duplicate%E5%9F%BA%E4%BA%8E%E6%BA%90%E5%BA%93rman%E5%A4%87%E4%BB%BD%E5%A4%8D%E5%88%B6%E6%95%B0%E6%8D%AE%E5%BA%93/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>duplicate db from rman backup/duplicate复制数据库 | 自律自由</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="自律自由" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">自律自由</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">yaogang</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/11/duplicate%E5%9F%BA%E4%BA%8E%E6%BA%90%E5%BA%93rman%E5%A4%87%E4%BB%BD%E5%A4%8D%E5%88%B6%E6%95%B0%E6%8D%AE%E5%BA%93/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="姚刚">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="自律自由">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          duplicate db from rman backup/duplicate复制数据库
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-05-11 23:08:00" itemprop="dateCreated datePublished" datetime="2019-05-11T23:08:00+00:00">2019-05-11</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-08-04 02:24:02" itemprop="dateModified" datetime="2020-08-04T02:24:02+00:00">2020-08-04</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/oracle/" itemprop="url" rel="index"><span itemprop="name">oracle</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><strong>源库需要开启归档，不需要备份，不会影响源库（当然，一点点clone性能除外）</strong></p>
+<p><em>和 from active database 不同，target可以处于关闭状态，channel使用的是 auxiliary实例的，不能配置 parallelism ，好像速度更快额，因为from active database 是先backup copy 然后在switch ，其实原理和直接拷贝rman备份恢复一样，只不过rman备份恢复更加灵活，不一定要在一个文件夹，可以指定arch文件恢复，但步骤相对较多，而这个duplicate基于rman备份复制比较简单，也是基于rman备份，先把source库恢复起来，然后在重置db_name为SRM2，注意额，rman恢复后db_name是一样的SRM，这个duplicate是复制库，db_name是SRM2不一样的，^_^</em></p>
+<p><strong><em>环境信息</em></strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">source db:</span><br><span class="line"></span><br><span class="line">sid&#x3D;SRM</span><br><span class="line">db_name &#x3D; SRM</span><br><span class="line">db_file_path &#x3D; &#x2F;u01&#x2F;app&#x2F;oracle&#x2F;oradata&#x2F;SRM&#x2F;</span><br><span class="line">sys_pwd &#x3D; oracle</span><br><span class="line">oracle_version &#x3D; Oracle Database 11g Enterprise Edition Release 11.2.0.4.0 - 64bit Production</span><br><span class="line">服务器资源 &#x3D; 4核4G内存40G磁盘</span><br><span class="line">OS &#x3D; CentOS Linux release 7.6.1810 (Core)</span><br></pre></td></tr></table></figure>
+<p>###操作步骤<br>####1. 启动auxiliary instance</p>
+<p><strong>1）. 新建静态listener – 注意 sid 区分大小写，一定要和ORACLE_SID一样</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">lsnrctl stop</span><br><span class="line">vim listener.ora</span><br><span class="line">---------------------------------------------------------------------------------------</span><br><span class="line">LISTENER&#x3D;</span><br><span class="line">  (DESCRIPTION&#x3D;</span><br><span class="line">    (ADDRESS_LIST&#x3D;</span><br><span class="line">      (ADDRESS&#x3D;(PROTOCOL&#x3D;tcp)(HOST&#x3D;localhost)(PORT&#x3D;1521))</span><br><span class="line">      (ADDRESS&#x3D;(PROTOCOL&#x3D;ipc)(KEY&#x3D;extproc))))</span><br><span class="line">SID_LIST_LISTENER&#x3D;</span><br><span class="line">  (SID_LIST&#x3D;</span><br><span class="line">    (SID_DESC&#x3D;</span><br><span class="line">      (GLOBAL_DBNAME&#x3D;SRM)</span><br><span class="line">      (ORACLE_HOME&#x3D;&#x2F;u01&#x2F;app&#x2F;oracle&#x2F;product&#x2F;11.2.0&#x2F;dbhome_1)</span><br><span class="line">      (SID_NAME&#x3D;SRM))</span><br><span class="line">    (SID_DESC&#x3D;</span><br><span class="line">      (GLOBAL_DBNAME&#x3D;SRM2)</span><br><span class="line">      (ORACLE_HOME&#x3D;&#x2F;u01&#x2F;app&#x2F;oracle&#x2F;product&#x2F;11.2.0&#x2F;dbhome_1)</span><br><span class="line">      (SID_NAME&#x3D;SRM2))</span><br><span class="line">  )</span><br><span class="line">---------------------------------------------------------------------------------------</span><br><span class="line">lsnrctl start</span><br><span class="line">lsnrctl status</span><br></pre></td></tr></table></figure>
+
+<p><strong>2）增加tns</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">---------------------------------------------------------------------------------------</span><br><span class="line">SRM &#x3D;</span><br><span class="line">  (DESCRIPTION &#x3D;</span><br><span class="line">    (ADDRESS_LIST &#x3D;</span><br><span class="line">      (ADDRESS &#x3D; (PROTOCOL &#x3D; TCP)(HOST &#x3D; localhost.localdomain)(PORT &#x3D; 1521))</span><br><span class="line">    )</span><br><span class="line">    (CONNECT_DATA &#x3D;</span><br><span class="line">      (SERVER &#x3D; DEDICATED)</span><br><span class="line">      (SERVICE_NAME &#x3D; SRM)</span><br><span class="line">    )</span><br><span class="line">  )</span><br><span class="line">SRM2 &#x3D;</span><br><span class="line">  (DESCRIPTION &#x3D;</span><br><span class="line">    (ADDRESS_LIST &#x3D;</span><br><span class="line">      (ADDRESS &#x3D; (PROTOCOL &#x3D; TCP)(HOST &#x3D; localhost.localdomain)(PORT &#x3D; 1521))</span><br><span class="line">    )</span><br><span class="line">    (CONNECT_DATA &#x3D;</span><br><span class="line">      (SERVER &#x3D; DEDICATED)</span><br><span class="line">      (SERVICE_NAME &#x3D; SRM2)</span><br><span class="line">    )</span><br><span class="line">  )</span><br><span class="line">---------------------------------------------------------------------------------------</span><br></pre></td></tr></table></figure>
+
+<p><strong>3）复制密码文件，或者新建</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[oracle@yg-test dbs]$ cp orapwSRM orapwSRM2</span><br></pre></td></tr></table></figure>
+
+<p>*<em>4）创建pfile并修改启动nomount, 注意: 如果自己创建pfile要加上：</em>.compatible=’11.2.0.4.0’**</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SQL&gt; create pfile&#x3D;&#39;&#x2F;home&#x2F;oracle&#x2F;dup_pfile.ora&#39; from spfile;</span><br></pre></td></tr></table></figure>
+
+<p><strong>5）修改dup_pfile.ora中的：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">*.db_name&#x3D;&#39;SRM2&#39;</span><br><span class="line">*.audit_file_dest&#x3D;&#39;&#x2F;u01&#x2F;app&#x2F;oracle&#x2F;admin&#x2F;SRM2&#x2F;adump&#39;</span><br><span class="line">*.control_files&#x3D;&#39;&#x2F;u01&#x2F;app&#x2F;oracle&#x2F;oradata&#x2F;SRM2&#x2F;control01.ctl&#39;,&#39;&#x2F;u01&#x2F;app&#x2F;oracle&#x2F;oradata&#x2F;SRM2&#x2F;control02.ctl&#39;</span><br></pre></td></tr></table></figure>
+
+<p><strong>6）添加参数</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">db_file_name_convert&#x3D;&#39;&#x2F;u01&#x2F;app&#x2F;oracle&#x2F;oradata&#x2F;SRM&#39;,&#39;&#x2F;u01&#x2F;app&#x2F;oracle&#x2F;oradata&#x2F;SRM2&#39;</span><br><span class="line">log_file_name_convert&#x3D;&#39;&#x2F;u01&#x2F;app&#x2F;oracle&#x2F;oradata&#x2F;SRM&#39;,&#39;&#x2F;u01&#x2F;app&#x2F;oracle&#x2F;oradata&#x2F;SRM2&#39;</span><br></pre></td></tr></table></figure>
+
+<p><strong>7）新建dup库的新文件夹：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p &#x2F;u01&#x2F;app&#x2F;oracle&#x2F;admin&#x2F;SRM2&#x2F;adump &#x2F;u01&#x2F;app&#x2F;oracle&#x2F;oradata&#x2F;SRM2</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>####2. 准备备份<br>**1）在源库操作备份</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">#注意： 源库SRM的数据、归档、控制文件都要在rman一个位置下面，rman下面只能有一个db备份，auxiliary要能访问这个rman目录</span><br><span class="line">#新建备份文件夹 </span><br><span class="line">[oracle@yg-test ~]$ mkdir rman</span><br><span class="line">#备份db</span><br><span class="line">RMAN&gt; backup as compressed backupset database format &#39;&#x2F;home&#x2F;oracle&#x2F;rman&#x2F;db_%U&#39;;</span><br><span class="line">#备份归档</span><br><span class="line">RMAN&gt; backup archivelog all format &#39;&#x2F;home&#x2F;oracle&#x2F;rman&#x2F;arch_%U&#39;;</span><br><span class="line">#备份spfile</span><br><span class="line">RMAN&gt; backup spfile format &#39;&#x2F;home&#x2F;oracle&#x2F;rman&#x2F;spfile_%U&#39;;</span><br><span class="line">#备份控制文件</span><br><span class="line">RMAN&gt; backup current controlfile format &#39;&#x2F;home&#x2F;oracle&#x2F;rman&#x2F;control_%U&#39;;</span><br></pre></td></tr></table></figure>
+
+<p>####3. 开始基于源库duplicate</p>
+<p><strong>1）修改环境变量ORACLE_SID: SRM –&gt; SRM2</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[oracle@yg-test ~]$ echo $ORACLE_SID</span><br><span class="line">SRM</span><br><span class="line">[oracle@yg-test ~]$ sqlplus &#x2F; as sysdba</span><br><span class="line">SQL&gt; shu immediate;</span><br><span class="line">SQL&gt; exit</span><br><span class="line">[oracle@yg-test ~]$ export ORACLE_SID&#x3D;SRM2</span><br><span class="line">[oracle@yg-test ~]$ echo $ORACLE_SID</span><br><span class="line">SRM2</span><br></pre></td></tr></table></figure>
+
+<p><strong>2）以nomount模式启动：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[oracle@yg-test ~]$ sqlplus &#x2F; as sysdba</span><br><span class="line">SQL&gt; startup nomount pfile&#x3D;&#x2F;home&#x2F;oracle&#x2F;dup_pfile.ora;</span><br><span class="line">SQL&gt; exit</span><br></pre></td></tr></table></figure>
+
+<p><strong>3）检查实例进程</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[oracle@yg-test ~]$ ps -ef |grep smon    # 只有auxiliary实例在运行</span><br><span class="line">oracle   46994     1  0 07:21 ?        00:00:00 ora_smon_SMR2</span><br></pre></td></tr></table></figure>
+
+<p><strong>4）检查远程sys登录 – 注意都必须是 ： EXCLUSIVE</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[oracle@yg-test ~]$ sqlplus &#x2F; as sysdba</span><br><span class="line">SQL&gt; set line 140</span><br><span class="line">SQL&gt; show parameter remote_login_passwordfile</span><br><span class="line"></span><br><span class="line">NAME                                 TYPE                              VALUE</span><br><span class="line">------------------------------------ --------------------------------- ------------------------------</span><br><span class="line">remote_login_passwordfile            string                            EXCLUSIVE</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p><strong>5）测试 aux db 的sys远程登录,都要正常登录，不能为idle状态</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sqlplus sys&#x2F;oracle@srm2 as sysdba</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p><strong>6）rman登录auxiliary库</strong>  # 注意区别，这里直接使用备份，没有登录target库</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[oracle@yg-test ~]$ rman auxiliary sys&#x2F;oracle@srm2</span><br><span class="line">connected to auxiliary database: SRM (not mounted)  -- 注意以后nomount启动，rman连上为 not mounted</span><br></pre></td></tr></table></figure>
+
+<p><strong>7）开始复制 – 注意: 如果ctronl_file已经拷贝，由于其他原因再次拷贝，请先备份删除控制文件</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">RMAN&gt; duplicate database to SRM2 backup location &#39;&#x2F;home&#x2F;oracle&#x2F;rman&#39; nofilenamecheck;</span><br></pre></td></tr></table></figure>
+
+<p><strong>8）重建spfile</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">SQL&gt; shu immediate;</span><br><span class="line">SQL&gt;  create spfile from pfile&#x3D;&#39;&#x2F;home&#x2F;oracle&#x2F;dup_pfile.ora&#39;;</span><br><span class="line">SQL&gt; startup</span><br><span class="line">SQL&gt; show parameter spfile;</span><br><span class="line">NAME                                 TYPE                              VALUE</span><br><span class="line">------------------------------------ --------------------------------- ------------------------------</span><br><span class="line">spfile                               string                            &#x2F;u01&#x2F;app&#x2F;oracle&#x2F;product&#x2F;11.2.0</span><br><span class="line">                                                                       &#x2F;dbhome_1&#x2F;dbs&#x2F;spfileSRM2.ora</span><br></pre></td></tr></table></figure>
+<p><strong>9）校验 –查到之前数据，成功</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">SQL&gt; select * from reco;</span><br><span class="line">        ID</span><br><span class="line">----------</span><br><span class="line">         1</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/oracle/" rel="tag"># oracle</a>
+              <a href="/tags/duplicate/" rel="tag"># duplicate</a>
+              <a href="/tags/rman/" rel="tag"># rman</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/05/11/%E4%BD%BF%E7%94%A8_duplicate_%E7%AE%80%E5%8D%95%E9%85%8D%E7%BD%AEactive_data_guard/" rel="prev" title="oracle 11.2.0.4.0 使用 duplicate 配置 data guard">
+      <i class="fa fa-chevron-left"></i> oracle 11.2.0.4.0 使用 duplicate 配置 data guard
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/11/09/oracle-11g-%E5%90%8C%E5%BA%93%E6%90%AD%E5%BB%BA-ogg-%E8%BF%9B%E9%98%B61(GoldenGate)/" rel="next" title="oracle 11g 同库搭建 ogg-进阶1">
+      oracle 11g 同库搭建 ogg-进阶1 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">姚刚</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">22</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">categories</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">32</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">姚刚</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

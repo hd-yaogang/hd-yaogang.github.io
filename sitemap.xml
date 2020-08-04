@@ -2,170 +2,163 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>http://yoursite.com/2020/08/03/12.2.0_RAC_ORACLE_HOME_chmod%E5%92%8Cchown%E6%83%A8%E6%A1%88%E6%81%A2%E5%A4%8D%E4%B8%80%E4%BE%8B/</loc>
-    
-    <lastmod>2020-08-03</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://yoursite.com/2020/08/03/data_guard_broker_%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/</loc>
-    
-    <lastmod>2020-08-03</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://yoursite.com/2020/08/03/duplicate%E5%9F%BA%E4%BA%8Eactive%E6%BA%90%E5%BA%93%E5%A4%8D%E5%88%B6%E6%95%B0%E6%8D%AE%E5%BA%93/</loc>
-    
-    <lastmod>2020-08-03</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://yoursite.com/2020/08/03/duplicate%E5%9F%BA%E4%BA%8E%E6%BA%90%E5%BA%93rman%E5%A4%87%E4%BB%BD%E5%A4%8D%E5%88%B6%E6%95%B0%E6%8D%AE%E5%BA%93/</loc>
-    
-    <lastmod>2020-08-03</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://yoursite.com/2020/08/03/hexo_deploy/</loc>
-    
-    <lastmod>2020-08-03</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://yoursite.com/2020/08/03/mysql%E5%90%8C%E6%9C%BA%E5%8F%8C%E5%AE%9E%E4%BE%8B%E7%AE%80%E5%8D%95%E9%85%8D%E7%BD%AE/</loc>
-    
-    <lastmod>2020-08-03</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://yoursite.com/2020/08/03/oracle-11g-%E5%90%8C%E5%BA%93%E6%90%AD%E5%BB%BA-ogg-%E8%BF%9B%E9%98%B62(GoldenGate)/</loc>
-    
-    <lastmod>2020-08-03</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://yoursite.com/2020/08/03/oracle-11g-%E5%90%8C%E5%BA%93%E6%90%AD%E5%BB%BA-ogg-%E8%BF%9B%E9%98%B61(GoldenGate)/</loc>
-    
-    <lastmod>2020-08-03</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://yoursite.com/2018/01/30/oracle_1/</loc>
-    
-    <lastmod>2020-08-03</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://yoursite.com/2020/08/03/oracle_11g_%E5%90%8C%E5%BA%93%E6%90%AD%E5%BB%BAogg%E6%B5%8B%E8%AF%95(GoldenGate)/</loc>
-    
-    <lastmod>2020-08-03</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://yoursite.com/2020/08/03/oracle_12c_pdb_refresh_%E7%AE%80%E5%8D%95%E4%BB%8B%E7%BB%8D/</loc>
-    
-    <lastmod>2020-08-03</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://yoursite.com/2018/06/26/oracle_flashback1/</loc>
-    
-    <lastmod>2020-08-03</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>http://yoursite.com/2020/08/03/postgresql-%E5%90%8C%E6%9C%BA%E7%89%A9%E7%90%86%E5%BC%82%E6%AD%A5%E4%B8%BB%E5%A4%87%E5%BA%93%E6%90%AD%E5%BB%BA/</loc>
     
-    <lastmod>2020-08-03</lastmod>
+    <lastmod>2020-08-04</lastmod>
     
   </url>
   
   <url>
     <loc>http://yoursite.com/2018/01/30/unison_1/</loc>
     
-    <lastmod>2020-08-03</lastmod>
+    <lastmod>2020-08-04</lastmod>
     
   </url>
   
   <url>
-    <loc>http://yoursite.com/2020/08/03/%E4%BD%BF%E7%94%A8_duplicate_%E7%AE%80%E5%8D%95%E9%85%8D%E7%BD%AEactive_data_guard/</loc>
+    <loc>http://yoursite.com/2019/05/11/%E4%BD%BF%E7%94%A8_duplicate_%E7%AE%80%E5%8D%95%E9%85%8D%E7%BD%AEactive_data_guard/</loc>
     
-    <lastmod>2020-08-03</lastmod>
+    <lastmod>2020-08-04</lastmod>
     
   </url>
   
   <url>
     <loc>http://yoursite.com/2020/03/04/squid_proxy/</loc>
     
-    <lastmod>2020-08-03</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://yoursite.com/2018/08/18/git+httpd/</loc>
-    
-    <lastmod>2020-08-03</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://yoursite.com/2018/01/30/cas_server/</loc>
-    
-    <lastmod>2020-08-03</lastmod>
+    <lastmod>2020-08-04</lastmod>
     
   </url>
   
   <url>
     <loc>http://yoursite.com/2020/03/04/oracle%20incarnation%E7%90%86%E8%A7%A3/</loc>
     
-    <lastmod>2020-08-03</lastmod>
+    <lastmod>2020-08-04</lastmod>
     
   </url>
   
   <url>
     <loc>http://yoursite.com/2020/03/05/sql_trace%E5%92%8C10046/</loc>
     
-    <lastmod>2020-08-03</lastmod>
+    <lastmod>2020-08-04</lastmod>
     
   </url>
   
   <url>
     <loc>http://yoursite.com/2020/05/25/oracle%E6%95%B0%E6%8D%AE%E5%BA%93-block%E7%AE%80%E5%8D%95%E5%89%96%E6%9E%90/</loc>
     
-    <lastmod>2020-08-03</lastmod>
+    <lastmod>2020-08-04</lastmod>
     
   </url>
   
   <url>
     <loc>http://yoursite.com/2020/05/13/%E4%B8%83%E5%BD%A9%E8%99%B9%E4%B8%BB%E6%9D%BFc.h61u%20v25(cf-g6-mx%20series2.5)-BIOS%E5%8D%87%E7%BA%A7/</loc>
     
-    <lastmod>2020-08-03</lastmod>
+    <lastmod>2020-08-04</lastmod>
     
   </url>
   
   <url>
-    <loc>http://yoursite.com/2020/08/03/hello-world/</loc>
+    <loc>http://yoursite.com/2019/12/26/12.2.0_RAC_ORACLE_HOME_chmod%E5%92%8Cchown%E6%83%A8%E6%A1%88%E6%81%A2%E5%A4%8D%E4%B8%80%E4%BE%8B/</loc>
     
-    <lastmod>2020-08-03</lastmod>
+    <lastmod>2020-08-04</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://yoursite.com/2019/03/19/data_guard_broker_%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/</loc>
+    
+    <lastmod>2020-08-04</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://yoursite.com/2019/05/11/duplicate%E5%9F%BA%E4%BA%8Eactive%E6%BA%90%E5%BA%93%E5%A4%8D%E5%88%B6%E6%95%B0%E6%8D%AE%E5%BA%93/</loc>
+    
+    <lastmod>2020-08-04</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://yoursite.com/2019/05/11/duplicate%E5%9F%BA%E4%BA%8E%E6%BA%90%E5%BA%93rman%E5%A4%87%E4%BB%BD%E5%A4%8D%E5%88%B6%E6%95%B0%E6%8D%AE%E5%BA%93/</loc>
+    
+    <lastmod>2020-08-04</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://yoursite.com/2018/01/31/hexo_deploy/</loc>
+    
+    <lastmod>2020-08-04</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://yoursite.com/2018/12/11/mysql%E5%90%8C%E6%9C%BA%E5%8F%8C%E5%AE%9E%E4%BE%8B%E7%AE%80%E5%8D%95%E9%85%8D%E7%BD%AE/</loc>
+    
+    <lastmod>2020-08-04</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://yoursite.com/2019/11/09/oracle-11g-%E5%90%8C%E5%BA%93%E6%90%AD%E5%BB%BA-ogg-%E8%BF%9B%E9%98%B61(GoldenGate)/</loc>
+    
+    <lastmod>2020-08-04</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://yoursite.com/2019/11/09/oracle-11g-%E5%90%8C%E5%BA%93%E6%90%AD%E5%BB%BA-ogg-%E8%BF%9B%E9%98%B62(GoldenGate)/</loc>
+    
+    <lastmod>2020-08-04</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://yoursite.com/2018/01/30/oracle_1/</loc>
+    
+    <lastmod>2020-08-04</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://yoursite.com/2019/11/19/oracle_11g_%E5%90%8C%E5%BA%93%E6%90%AD%E5%BB%BAogg%E6%B5%8B%E8%AF%95(GoldenGate)/</loc>
+    
+    <lastmod>2020-08-04</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://yoursite.com/2018/04/26/oracle_12c_pdb_refresh_%E7%AE%80%E5%8D%95%E4%BB%8B%E7%BB%8D/</loc>
+    
+    <lastmod>2020-08-04</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://yoursite.com/2018/06/26/oracle_flashback1/</loc>
+    
+    <lastmod>2020-08-04</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://yoursite.com/2018/08/18/git+httpd/</loc>
+    
+    <lastmod>2020-08-04</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://yoursite.com/2018/01/30/cas_server/</loc>
+    
+    <lastmod>2020-08-04</lastmod>
     
   </url>
   
 
   <url>
     <loc>http://yoursite.com/</loc>
-    <lastmod>2020-08-03</lastmod>
+    <lastmod>2020-08-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
@@ -173,217 +166,224 @@
   
   <url>
     <loc>http://yoursite.com/tags/oracle/</loc>
-    <lastmod>2020-08-03</lastmod>
+    <lastmod>2020-08-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>http://yoursite.com/tags/rac/</loc>
-    <lastmod>2020-08-03</lastmod>
+    <lastmod>2020-08-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>http://yoursite.com/tags/data-guard/</loc>
-    <lastmod>2020-08-03</lastmod>
+    <lastmod>2020-08-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>http://yoursite.com/tags/broker/</loc>
-    <lastmod>2020-08-03</lastmod>
+    <lastmod>2020-08-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>http://yoursite.com/tags/duplicate/</loc>
-    <lastmod>2020-08-03</lastmod>
+    <lastmod>2020-08-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>http://yoursite.com/tags/rman/</loc>
-    <lastmod>2020-08-03</lastmod>
+    <lastmod>2020-08-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>http://yoursite.com/tags/centos6/</loc>
-    <lastmod>2020-08-03</lastmod>
+    <lastmod>2020-08-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>http://yoursite.com/tags/hexo/</loc>
-    <lastmod>2020-08-03</lastmod>
+    <lastmod>2020-08-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>http://yoursite.com/tags/githup/</loc>
-    <lastmod>2020-08-03</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>http://yoursite.com/tags/GoldenGate/</loc>
-    <lastmod>2020-08-03</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>http://yoursite.com/tags/centos/</loc>
-    <lastmod>2020-08-03</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>http://yoursite.com/tags/11g/</loc>
-    <lastmod>2020-08-03</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>http://yoursite.com/tags/oracle12c/</loc>
-    <lastmod>2020-08-03</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>http://yoursite.com/tags/refresh/</loc>
-    <lastmod>2020-08-03</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>http://yoursite.com/tags/pdb/</loc>
-    <lastmod>2020-08-03</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>http://yoursite.com/tags/clone/</loc>
-    <lastmod>2020-08-03</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>http://yoursite.com/tags/flashback/</loc>
-    <lastmod>2020-08-03</lastmod>
+    <lastmod>2020-08-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>http://yoursite.com/tags/database/</loc>
-    <lastmod>2020-08-03</lastmod>
+    <lastmod>2020-08-04</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>http://yoursite.com/tags/mysql/</loc>
+    <lastmod>2020-08-04</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>http://yoursite.com/tags/GoldenGate/</loc>
+    <lastmod>2020-08-04</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>http://yoursite.com/tags/centos/</loc>
+    <lastmod>2020-08-04</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>http://yoursite.com/tags/11g/</loc>
+    <lastmod>2020-08-04</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>http://yoursite.com/tags/oracle12c/</loc>
+    <lastmod>2020-08-04</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>http://yoursite.com/tags/refresh/</loc>
+    <lastmod>2020-08-04</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>http://yoursite.com/tags/pdb/</loc>
+    <lastmod>2020-08-04</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>http://yoursite.com/tags/clone/</loc>
+    <lastmod>2020-08-04</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>http://yoursite.com/tags/flashback/</loc>
+    <lastmod>2020-08-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>http://yoursite.com/tags/postgrepsql/</loc>
-    <lastmod>2020-08-03</lastmod>
+    <lastmod>2020-08-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>http://yoursite.com/tags/pg10/</loc>
-    <lastmod>2020-08-03</lastmod>
+    <lastmod>2020-08-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>http://yoursite.com/tags/linux/</loc>
-    <lastmod>2020-08-03</lastmod>
+    <lastmod>2020-08-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>http://yoursite.com/tags/unison/</loc>
-    <lastmod>2020-08-03</lastmod>
+    <lastmod>2020-08-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>http://yoursite.com/tags/%E6%AD%A3%E5%90%91%E4%BB%A3%E7%90%86/</loc>
-    <lastmod>2020-08-03</lastmod>
+    <lastmod>2020-08-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>http://yoursite.com/tags/git/</loc>
-    <lastmod>2020-08-03</lastmod>
+    <lastmod>2020-08-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>http://yoursite.com/tags/cas/</loc>
-    <lastmod>2020-08-03</lastmod>
+    <lastmod>2020-08-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>http://yoursite.com/tags/incarnation/</loc>
-    <lastmod>2020-08-03</lastmod>
+    <lastmod>2020-08-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>http://yoursite.com/tags/event/</loc>
-    <lastmod>2020-08-03</lastmod>
+    <lastmod>2020-08-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>http://yoursite.com/tags/sql-trace/</loc>
-    <lastmod>2020-08-03</lastmod>
+    <lastmod>2020-08-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>http://yoursite.com/tags/block/</loc>
-    <lastmod>2020-08-03</lastmod>
+    <lastmod>2020-08-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>http://yoursite.com/tags/%E4%B8%BB%E6%9D%BF/</loc>
-    <lastmod>2020-08-03</lastmod>
+    <lastmod>2020-08-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>http://yoursite.com/tags/bios/</loc>
-    <lastmod>2020-08-03</lastmod>
+    <lastmod>2020-08-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
@@ -392,49 +392,56 @@
   
   <url>
     <loc>http://yoursite.com/categories/oracle-12c-rac/</loc>
-    <lastmod>2020-08-03</lastmod>
+    <lastmod>2020-08-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>http://yoursite.com/categories/oracle/</loc>
-    <lastmod>2020-08-03</lastmod>
+    <lastmod>2020-08-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>http://yoursite.com/categories/centos6/</loc>
-    <lastmod>2020-08-03</lastmod>
+    <lastmod>2020-08-04</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>http://yoursite.com/categories/database/</loc>
+    <lastmod>2020-08-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>http://yoursite.com/categories/oracle12c/</loc>
-    <lastmod>2020-08-03</lastmod>
+    <lastmod>2020-08-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>http://yoursite.com/categories/postgrepsql/</loc>
-    <lastmod>2020-08-03</lastmod>
+    <lastmod>2020-08-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>http://yoursite.com/categories/linux/</loc>
-    <lastmod>2020-08-03</lastmod>
+    <lastmod>2020-08-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>http://yoursite.com/categories/windows/</loc>
-    <lastmod>2020-08-03</lastmod>
+    <lastmod>2020-08-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>

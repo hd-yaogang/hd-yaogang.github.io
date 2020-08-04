@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="oracle 12c pdb refresh 简单介绍闲话12好久没有写博客，虽然忙但时间还是有的，就是感觉没东西写，学到的东西小的记笔记，大的写成文档，没有那种自己领悟很深的东西来写博客，就写一下pdb refresh凑个篇数 ^_^感兴趣的看一下  :smiling_imp: 正文 环境：        oracle12.2单实例clone到12.2 rac，我需要把测试环境pdb复制到正式，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="oracle 12c pdb refresh 简单介绍">
+<meta property="og:url" content="http://yoursite.com/2018/04/26/oracle_12c_pdb_refresh_%E7%AE%80%E5%8D%95%E4%BB%8B%E7%BB%8D/index.html">
+<meta property="og:site_name" content="自律自由">
+<meta property="og:description" content="oracle 12c pdb refresh 简单介绍闲话12好久没有写博客，虽然忙但时间还是有的，就是感觉没东西写，学到的东西小的记笔记，大的写成文档，没有那种自己领悟很深的东西来写博客，就写一下pdb refresh凑个篇数 ^_^感兴趣的看一下  :smiling_imp: 正文 环境：        oracle12.2单实例clone到12.2 rac，我需要把测试环境pdb复制到正式，">
+<meta property="og:locale">
+<meta property="article:published_time" content="2018-04-26T20:08:00.000Z">
+<meta property="article:modified_time" content="2020-08-04T02:24:02.646Z">
+<meta property="article:author" content="姚刚">
+<meta property="article:tag" content="oracle12c">
+<meta property="article:tag" content="refresh">
+<meta property="article:tag" content="pdb">
+<meta property="article:tag" content="clone">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2018/04/26/oracle_12c_pdb_refresh_%E7%AE%80%E5%8D%95%E4%BB%8B%E7%BB%8D/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>oracle 12c pdb refresh 简单介绍 | 自律自由</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="自律自由" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">自律自由</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">yaogang</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/26/oracle_12c_pdb_refresh_%E7%AE%80%E5%8D%95%E4%BB%8B%E7%BB%8D/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="姚刚">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="自律自由">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          oracle 12c pdb refresh 简单介绍
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-04-26 20:08:00" itemprop="dateCreated datePublished" datetime="2018-04-26T20:08:00+00:00">2018-04-26</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-08-04 02:24:02" itemprop="dateModified" datetime="2020-08-04T02:24:02+00:00">2020-08-04</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/oracle12c/" itemprop="url" rel="index"><span itemprop="name">oracle12c</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="oracle-12c-pdb-refresh-简单介绍"><a href="#oracle-12c-pdb-refresh-简单介绍" class="headerlink" title="oracle 12c pdb refresh 简单介绍"></a>oracle 12c pdb refresh 简单介绍</h2><h4 id="闲话"><a href="#闲话" class="headerlink" title="闲话"></a>闲话</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">好久没有写博客，虽然忙但时间还是有的，就是感觉没东西写，学到的东西小的记笔记，大的写成文档，没有那种自己领悟很深的东西来写博客，就写一下pdb refresh凑个篇数 ^_^</span><br><span class="line">感兴趣的看一下</span><br></pre></td></tr></table></figure>
+
+<p>:smiling_imp:</p>
+<h4 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h4><blockquote>
+<p>环境：</p>
+<p>       oracle12.2单实例clone到12.2 rac，我需要把测试环境pdb复制到正式，但是他们测试系统还没有开发结束就急着上线，后面开发的数据库代码需要技术手动插入正式，听说过pdb刷新，就想能不能就解决这个问题，于是学习了一波…结果搞明白了，但是用处不是太大，哈哈:sob:</p>
+</blockquote>
+<hr>
+<p><strong>克隆</strong></p>
+<blockquote>
+<p>先决条件：</p>
+<p>      1.目标位置具有建库权限</p>
+<p>      2.源pdb启用归档或者read only</p>
+<p>      3.源pdb使用本地undo</p>
+<p>      4.尽量目标库为al32utf8</p>
+<p>      6.有dblink连接</p>
+<p>      7.刷新模式必须为2个不同的cdb容器中的pdb</p>
+<p>         其他不重要…</p>
+</blockquote>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--源库开启归档或者read only</span></span><br><span class="line">SQL&gt; alter pluggable database open read only;</span><br><span class="line"></span><br><span class="line"><span class="comment">--目标库创建源库的dblink,这里使用的tns：srm_test需要提前创建好</span></span><br><span class="line">SQL&gt; conn /as sysdba;</span><br><span class="line">SQL&gt; create public database link srmtest_dblink connect to srm identified by xxxx using &#x27;srm_test&#x27;;  </span><br><span class="line"></span><br><span class="line"><span class="comment">--进行hot远程克隆,并且制定刷新模式为 手动</span></span><br><span class="line">SQL&gt; create pluggable database srm_pro from srm_test@srmtest_dblink refresh mode manual;</span><br><span class="line"></span><br><span class="line"><span class="comment">--克隆完成，打开目标pdb</span></span><br><span class="line">SQL&gt; alter pluggable database srm_pro open; --默认为open read write模式</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>这里会显示修改完成，即目标pdb打开，但是show pdbs一看，还是srm_pro还是mounted状态，再来一次，不报错，但还是死活打不开。–官方说明，必须read only模式打开</p>
+</blockquote>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--于是执行,果然打开了</span></span><br><span class="line">SQL&gt; alter pluggable database srm_pro open read only instances = all;</span><br></pre></td></tr></table></figure>
+
+<p><strong>刷新</strong></p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--于是执行,果然打开了</span></span><br><span class="line">SQL&gt; alter pluggable database srm_pro open read only instances = all;</span><br><span class="line"></span><br><span class="line"><span class="comment">--测试刷新，现在源库新建一张表，然后到目标库刷新，再查询目标库是否同步数据</span></span><br><span class="line">SQL&gt; conn xx/xxx@srm_test;</span><br><span class="line">SQL&gt; create table t1(c1 number);insert into t1 values(123);</span><br><span class="line">SQL&gt; desc t1; select * from t1; --查看新建的表</span><br><span class="line"></span><br><span class="line"><span class="comment">--目标库进行刷新</span></span><br><span class="line">SQL&gt; alter pluggable database srm_pro close immediate instances = all;</span><br><span class="line">SQL&gt; alter session set container = srm_pro;</span><br><span class="line">SQL&gt; alter pluggable database refresh;</span><br><span class="line">SQL&gt; alter pluggable database open read only;</span><br><span class="line">SQL&gt; conn xxx/xxxx@srm_pro;</span><br><span class="line">SQL&gt; desc t1;select * from t1; --已经查询到在源库新建的测试数据表t1</span><br></pre></td></tr></table></figure>
+
+<p><strong>总结</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">刷新模式：3种  --注意，刷新模式可以修改，但是从刷新模式变成不刷新后就不能再改回刷新模式了</span><br><span class="line">-- 手动刷新</span><br><span class="line">SQL&gt; CREATE PLUGGABLE DATABASE pdb5_ro FROM pdb5@clone_link</span><br><span class="line">  REFRESH MODE MANUAL;</span><br><span class="line"></span><br><span class="line">-- 60分钟定时刷新</span><br><span class="line">SQL&gt; CREATE PLUGGABLE DATABASE pdb5_ro FROM pdb5@clone_link</span><br><span class="line">  REFRESH MODE EVERY 60 MINUTES;</span><br><span class="line"></span><br><span class="line">-- 不刷新，默认创建pdb时不加刷新参数就是不刷新</span><br><span class="line">SQL&gt; CREATE PLUGGABLE DATABASE pdb5_ro FROM pdb5@clone_link</span><br><span class="line">  REFRESH MODE NONE;</span><br><span class="line">SQL&gt; CREATE PLUGGABLE DATABASE pdb5_ro FROM pdb5@clone_link;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>思考：</p>
+<p>为什么只能read only呢？我想可能是为了保证目标数据于原数据库一致，不会数据冲突吧。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">修改pdb的刷新模式：</span><br><span class="line">-- 修改自动刷新时间</span><br><span class="line">SQL&gt; ALTER PLUGGABLE DATABASE pdb5_ro REFRESH MODE EVERY 60 MINUTES;</span><br><span class="line">SQL&gt; ALTER PLUGGABLE DATABASE pdb5_ro REFRESH MODE EVERY 120 MINUTES;</span><br><span class="line"></span><br><span class="line">-- 修改自动刷新为手动刷新</span><br><span class="line">SQL&gt; ALTER PLUGGABLE DATABASE pdb5_ro REFRESH MODE MANUAL;</span><br><span class="line"></span><br><span class="line">-- 修改为不刷新模式，注意：就无法再更改为手动或者自动刷新模式了</span><br><span class="line">SQL&gt; ALTER PLUGGABLE DATABASE CLOSE IMMEDIATE;</span><br><span class="line">SQL&gt; ALTER PLUGGABLE DATABASE pdb5_ro REFRESH MODE NONE;</span><br><span class="line">SQL&gt; ALTER PLUGGABLE DATABASE OPEN;</span><br></pre></td></tr></table></figure>
+
+<h4 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h4><blockquote>
+<p>本来想着，等测试开发结束，帮他们直接刷新到正式即可，但是不行，因为要保留刷新模式的话必须正式pdb一直处于read only状态，无法测试和预使用，有点小难受。:stuck_out_tongue_closed_eyes:</p>
+<p>oracle官方说明是，刷新模式可以用来做报表系统查询数据，可以用来源pdb克隆。</p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/oracle12c/" rel="tag"># oracle12c</a>
+              <a href="/tags/refresh/" rel="tag"># refresh</a>
+              <a href="/tags/pdb/" rel="tag"># pdb</a>
+              <a href="/tags/clone/" rel="tag"># clone</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/01/31/hexo_deploy/" rel="prev" title="hexo+githup 个人博客搭建">
+      <i class="fa fa-chevron-left"></i> hexo+githup 个人博客搭建
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/06/26/oracle_flashback1/" rel="next" title="oracle 恢复table删除数据 恢复package（使用闪回）">
+      oracle 恢复table删除数据 恢复package（使用闪回） <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#oracle-12c-pdb-refresh-%E7%AE%80%E5%8D%95%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.</span> <span class="nav-text">oracle 12c pdb refresh 简单介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%97%B2%E8%AF%9D"><span class="nav-number">1.0.1.</span> <span class="nav-text">闲话</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%AD%A3%E6%96%87"><span class="nav-number">1.0.2.</span> <span class="nav-text">正文</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BB%93%E8%AF%AD"><span class="nav-number">1.0.3.</span> <span class="nav-text">结语</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">姚刚</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">22</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">categories</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">32</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">姚刚</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

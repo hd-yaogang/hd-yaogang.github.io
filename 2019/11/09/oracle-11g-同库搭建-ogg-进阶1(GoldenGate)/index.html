@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="oracle 11g 同库搭建 ogg-进阶1本文为比上一篇参数稍多，主要做记录，其中配置若有误请见谅！！！ 此次为了方便就同机搭建，所以mgr端口不同，如果不同机搭建，mgr端口可以一致 搭建环境   name version    操作系统 CentOS Linux release 7.6.1810 (Core)   数据库版本 Oracle Database 11g Enterprise E">
+<meta property="og:type" content="article">
+<meta property="og:title" content="oracle 11g 同库搭建 ogg-进阶1">
+<meta property="og:url" content="http://yoursite.com/2019/11/09/oracle-11g-%E5%90%8C%E5%BA%93%E6%90%AD%E5%BB%BA-ogg-%E8%BF%9B%E9%98%B61(GoldenGate)/index.html">
+<meta property="og:site_name" content="自律自由">
+<meta property="og:description" content="oracle 11g 同库搭建 ogg-进阶1本文为比上一篇参数稍多，主要做记录，其中配置若有误请见谅！！！ 此次为了方便就同机搭建，所以mgr端口不同，如果不同机搭建，mgr端口可以一致 搭建环境   name version    操作系统 CentOS Linux release 7.6.1810 (Core)   数据库版本 Oracle Database 11g Enterprise E">
+<meta property="og:locale">
+<meta property="og:image" content="file:///C:/Users/yaogang/AppData/Local/Temp/SGPicFaceTpBq/120192/0C19E14F.png">
+<meta property="article:published_time" content="2019-11-09T23:00:00.000Z">
+<meta property="article:modified_time" content="2020-08-04T02:24:02.646Z">
+<meta property="article:author" content="姚刚">
+<meta property="article:tag" content="oracle">
+<meta property="article:tag" content="GoldenGate">
+<meta property="article:tag" content="centos">
+<meta property="article:tag" content="11g">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="file:///C:/Users/yaogang/AppData/Local/Temp/SGPicFaceTpBq/120192/0C19E14F.png">
+
+<link rel="canonical" href="http://yoursite.com/2019/11/09/oracle-11g-%E5%90%8C%E5%BA%93%E6%90%AD%E5%BB%BA-ogg-%E8%BF%9B%E9%98%B61(GoldenGate)/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>oracle 11g 同库搭建 ogg-进阶1 | 自律自由</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="自律自由" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">自律自由</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">yaogang</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/11/09/oracle-11g-%E5%90%8C%E5%BA%93%E6%90%AD%E5%BB%BA-ogg-%E8%BF%9B%E9%98%B61(GoldenGate)/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="姚刚">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="自律自由">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          oracle 11g 同库搭建 ogg-进阶1
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-11-09 23:00:00" itemprop="dateCreated datePublished" datetime="2019-11-09T23:00:00+00:00">2019-11-09</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-08-04 02:24:02" itemprop="dateModified" datetime="2020-08-04T02:24:02+00:00">2020-08-04</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/oracle/" itemprop="url" rel="index"><span itemprop="name">oracle</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="oracle-11g-同库搭建-ogg-进阶1"><a href="#oracle-11g-同库搭建-ogg-进阶1" class="headerlink" title="oracle 11g 同库搭建 ogg-进阶1"></a>oracle 11g 同库搭建 ogg-进阶1</h1><p><u>本文为比上一篇参数稍多，主要做记录，其中配置若有误请见谅！！！</u></p>
+<p><u>此次为了方便就同机搭建，所以mgr端口不同，如果不同机搭建，mgr端口可以一致</u></p>
+<h2 id="搭建环境"><a href="#搭建环境" class="headerlink" title="搭建环境"></a>搭建环境</h2><table>
+<thead>
+<tr>
+<th>name</th>
+<th>version</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>操作系统</td>
+<td>CentOS Linux release 7.6.1810 (Core)</td>
+</tr>
+<tr>
+<td>数据库版本</td>
+<td>Oracle Database 11g Enterprise Edition Release 11.2.0.4.0 - 64bit Production</td>
+</tr>
+<tr>
+<td>ogg版本</td>
+<td>Oracle GoldenGate Version 11.2.1.0.3 14400833 OGGCORE_11.2.1.0.3_PLATFORMS_120823.1258_FBO Linux, x64, 64bi</td>
+</tr>
+</tbody></table>
+<hr>
+<h3 id="1-新建ogg用户"><a href="#1-新建ogg用户" class="headerlink" title="1. 新建ogg用户"></a>1. 新建ogg用户</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">groupadd ogg</span><br><span class="line">useradd -g ogg -G oinstall,dba ogg</span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;oracle&quot;</span>| passwd --stdin oracle</span><br><span class="line"></span><br><span class="line">--上传oracle goldengate安装文件解压</span><br><span class="line">rz</span><br><span class="line">mkdir sogg togg</span><br><span class="line">mkdir sogg/temp</span><br><span class="line">unzip V34339-01.zip</span><br><span class="line">tar -xf fbo_ggs_Linux_x64_ora11g_64bit.tar -C sogg/</span><br><span class="line">tar -xf fbo_ggs_Linux_x64_ora11g_64bit.tar -C togg/</span><br><span class="line">--rm -f V34339-01.zip OGG_WinUnix_Rel_Notes_11.2.1.0.3.pdf  Oracle*</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-配置ogg环境变量"><a href="#2-配置ogg环境变量" class="headerlink" title="2. 配置ogg环境变量"></a>2. 配置ogg环境变量</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> TMP=/tmp</span><br><span class="line"><span class="built_in">export</span> ORACLE_BASE=/u01/app/oracle</span><br><span class="line"><span class="built_in">export</span> ORACLE_HOME=/u01/app/oracle/product/11.2.0/dbhome_1</span><br><span class="line"><span class="built_in">export</span> ORACLE_SID=SRM</span><br><span class="line"><span class="built_in">export</span> PATH=/u01/app/oracle/product/11.2.0/dbhome_1/bin:/usr/sbin:/u01/app/oracle/product/11.2.0/dbhome_1/OPatch:/usr/<span class="built_in">local</span>/sbin:/usr/<span class="built_in">local</span>/bin:/usr/sbin:/usr/bin:/root/bin</span><br><span class="line"><span class="built_in">export</span> LD_LIBRARY_PATH=/u01/app/oracle/product/11.2.0/dbhome_1/lib:/lib:/usr/lib</span><br><span class="line"><span class="built_in">export</span> CLASSPATH=/u01/app/oracle/product/11.2.0/dbhome_1/JRE:/u01/app/oracle/product/11.2.0/dbhome_1/jlib:/u01/app/oracle/product/11.2.0/dbhome_1/rdbms/jlib</span><br><span class="line"><span class="built_in">export</span> NLS_LANG=AMERICAN_AMERICA.UTF8</span><br><span class="line"><span class="built_in">export</span> LC_ALL=en_US.UTF-8</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-source和target都准备数据库"><a href="#3-source和target都准备数据库" class="headerlink" title="3. source和target都准备数据库"></a>3. source和target都准备数据库</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--11.2.0.4 以上需要开启  11g一下需要执行: alter system set recyclebin=off scope=both;</span></span><br><span class="line"><span class="keyword">set</span> lin <span class="number">200</span> pages <span class="number">30000</span></span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">system</span> <span class="keyword">set</span> enable_goldengate_replication = <span class="literal">true</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">create</span> <span class="keyword">tablespace</span> ogg_tbs <span class="keyword">datafile</span> <span class="string">&#x27;/u01/app/oracle/oradata/SRM/ogg_tbs01.dbf&#x27;</span> <span class="keyword">size</span> <span class="number">100</span>M <span class="keyword">autoextend</span> <span class="keyword">on</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">create</span> <span class="keyword">user</span> ogg <span class="keyword">identified</span> <span class="keyword">by</span> <span class="keyword">oracle</span> <span class="keyword">default</span> <span class="keyword">tablespace</span> ogg_tbs;</span><br><span class="line"><span class="keyword">grant</span> dba <span class="keyword">to</span> ogg;</span><br><span class="line"></span><br><span class="line"><span class="comment">--创建测试数据用户</span></span><br><span class="line"><span class="keyword">set</span> lin <span class="number">200</span> pages <span class="number">30000</span></span><br><span class="line"><span class="keyword">create</span> <span class="keyword">tablespace</span> test_tbs <span class="keyword">datafile</span> <span class="string">&#x27;/u01/app/oracle/oradata/SRM/test_tbs01.dbf&#x27;</span> <span class="keyword">size</span> <span class="number">10</span>M <span class="keyword">autoextend</span> <span class="keyword">on</span>;</span><br><span class="line"><span class="keyword">create</span> <span class="keyword">user</span> yg1 <span class="keyword">identified</span> <span class="keyword">by</span> <span class="keyword">oracle</span> <span class="keyword">default</span> <span class="keyword">tablespace</span> test_tbs;</span><br><span class="line"><span class="keyword">create</span> <span class="keyword">user</span> yg2 <span class="keyword">identified</span> <span class="keyword">by</span> <span class="keyword">oracle</span> <span class="keyword">default</span> <span class="keyword">tablespace</span> test_tbs;</span><br><span class="line"><span class="keyword">grant</span> dba <span class="keyword">to</span> yg1,yg2;</span><br><span class="line"></span><br><span class="line"><span class="comment">--开启archivelog、附加log、强制log</span></span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">database</span> <span class="keyword">archivelog</span>;</span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">database</span> <span class="keyword">force</span> <span class="keyword">logging</span>;</span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">database</span> <span class="keyword">add</span> supplemental <span class="keyword">log</span> <span class="keyword">data</span>;</span><br><span class="line"><span class="keyword">select</span> <span class="keyword">NAME</span>,OPEN_MODE,FORCE_LOGGING,SUPPLEMENTAL_LOG_DATA_MIN <span class="keyword">from</span> v$<span class="keyword">database</span>;</span><br><span class="line"><span class="comment">--注意一定要在/home/ogg/sogg目录下执行，不然会hang住</span></span><br><span class="line">@/home/ogg/sogg/marker_setup.sql</span><br><span class="line"><span class="comment">--ogg</span></span><br><span class="line">@/home/ogg/sogg/ddl_setup.sql</span><br><span class="line"><span class="comment">--ogg</span></span><br><span class="line">@/home/ogg/sogg/role_setup.sql</span><br><span class="line"><span class="comment">--ogg</span></span><br><span class="line"><span class="comment">--GRANT GGS_GGSUSER_ROLE TO ogg;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">--如果出现下面这个报错执行： drop TRIGGER SYS.GGS_DDL_TRIGGER_BEFORE ;</span></span><br><span class="line"><span class="comment">--有时候删除也不行，需要先ddl_disable再授权，具体报错谷歌一下就行</span></span><br><span class="line"><span class="comment">--ORA-04098: trigger &#x27;SYS.GGS_DDL_TRIGGER_BEFORE&#x27; is invalid and failed re-validation</span></span><br><span class="line"></span><br><span class="line">@/home/ogg/sogg/ddl_enable.sql</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-创建-GoldenGate-的工作目录"><a href="#4-创建-GoldenGate-的工作目录" class="headerlink" title="4. 创建 GoldenGate 的工作目录"></a>4. 创建 GoldenGate 的工作目录</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /home/ogg/sogg/</span><br><span class="line">./ggsci</span><br><span class="line">create subdirs</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span> /home/ogg/togg/</span><br><span class="line">./ggsci</span><br><span class="line">create subdirs</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-源端添加checkpointtable"><a href="#5-源端添加checkpointtable" class="headerlink" title="5. 源端添加checkpointtable"></a>5. 源端添加checkpointtable</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /home/ogg/sogg/</span><br><span class="line">./ggsci</span><br><span class="line"></span><br><span class="line">EDIT PARAMS ./GLOBALS</span><br><span class="line">-----------------------------------------</span><br><span class="line">GGSCHEMA ogg</span><br><span class="line">CHECKPOINTTABLE ogg.ggschkpt1</span><br><span class="line">-----------------------------------------</span><br><span class="line"><span class="built_in">exit</span></span><br><span class="line">./ggsci</span><br><span class="line">DBLOGIN USERID ogg, PASSWORD oracle</span><br><span class="line">ADD CHECKPOINTTABLE</span><br></pre></td></tr></table></figure>
+
+<h3 id="6-目标端添加checkpointtable"><a href="#6-目标端添加checkpointtable" class="headerlink" title="6. 目标端添加checkpointtable"></a>6. 目标端添加checkpointtable</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">cd &#x2F;home&#x2F;ogg&#x2F;togg&#x2F;</span><br><span class="line">.&#x2F;ggsci</span><br><span class="line">EDIT PARAMS .&#x2F;GLOBALS</span><br><span class="line">-----------------------------------------</span><br><span class="line">GGSCHEMA ogg</span><br><span class="line">CHECKPOINTTABLE ogg.ggschkpt2</span><br><span class="line">-----------------------------------------</span><br><span class="line">exit</span><br><span class="line">.&#x2F;ggsci</span><br><span class="line">DBLOGIN USERID ogg, PASSWORD oracle</span><br><span class="line">ADD CHECKPOINTTABLE</span><br></pre></td></tr></table></figure>
+
+<h3 id="7-源配置mgr"><a href="#7-源配置mgr" class="headerlink" title="7. 源配置mgr"></a>7. 源配置mgr</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">EDIT PARAMS MGR</span><br><span class="line">-----------------------------------------</span><br><span class="line">PORT 7809 </span><br><span class="line">DYNAMICPORTLIST 7800-8000</span><br><span class="line">AUTOSTART EXTRACT *</span><br><span class="line">AUTORESTART EXTRACT *,WAITMINUTES 2,RETRIES 5, RESETMINUTES 5</span><br><span class="line">PURGEOLDEXTRACTS /home/oracle/sogg/dirdat,USECHECKPOINTS,MINKEEPDAYS 1</span><br><span class="line">PURGEDDLHISTORY MINKEEPDAYS 3,MAXKEEPDAYS 7,FREQUENCYMINUTES 30</span><br><span class="line">PURGEMARKERHISTORY MINKEEPDAYS 3,MAXKEEPDAYS 7                                        </span><br><span class="line">-----------------------------------------</span><br><span class="line">LAGREPORTHOURS 1</span><br><span class="line">LAGINFOMINUTES 30</span><br><span class="line">LAGCRITICALMINUTES 45</span><br></pre></td></tr></table></figure>
+
+<h3 id="8-目标配置mgr"><a href="#8-目标配置mgr" class="headerlink" title="8. 目标配置mgr"></a>8. 目标配置mgr</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">EDIT PARAMS MGR</span><br><span class="line">-----------------------------------------</span><br><span class="line">PORT 8809 </span><br><span class="line">DYNAMICPORTLIST 8800-9000</span><br><span class="line">AUTOSTART EXTRACT *</span><br><span class="line">AUTORESTART EXTRACT *, WAITMINUTES 2, RESETMINUTES 5, RETRIES 5</span><br><span class="line">PURGEOLDEXTRACTS &#x2F;home&#x2F;ogg&#x2F;togg&#x2F;dirdat, USECHECKPOINTS, MINKEEPDAYS 3</span><br><span class="line">PURGEDDLHISTORY MINKEEPDAYS 3,MAXKEEPDAYS 7,FREQUENCYMINUTES 30</span><br><span class="line">PURGEMARKERHISTORY MINKEEPDAYS 3,MAXKEEPDAYS 7</span><br><span class="line"></span><br><span class="line">LAGREPORTHOURS 1</span><br><span class="line">LAGINFOMINUTES 30</span><br><span class="line">LAGCRITICALMINUTES 45</span><br><span class="line">-----------------------------------------</span><br><span class="line">start mgr</span><br><span class="line">info mgr</span><br></pre></td></tr></table></figure>
+
+<h3 id="9-源端配置-Extract-进程"><a href="#9-源端配置-Extract-进程" class="headerlink" title="9. 源端配置 Extract 进程"></a>9. 源端配置 Extract 进程</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">EDIT PARAMS EORA_1</span><br><span class="line">-----------------------------------------</span><br><span class="line">EXTRACT EORA_1</span><br><span class="line">SETENV (ORACLE_SID=<span class="string">&quot;SRM&quot;</span>)</span><br><span class="line">SETENV (NLS_LANG=AMERICAN_AMERICA.UTF8)</span><br><span class="line">USERID ogg, PASSWORD oracle</span><br><span class="line"></span><br><span class="line">GETTRUNCATES</span><br><span class="line">REPORTCOUNT EVERY 1 MINUTES,RATE</span><br><span class="line">NUMFILES 5000</span><br><span class="line">DISCARDROLLOVER AT 3:00</span><br><span class="line">WARNLONGTRANS 2h,CHECKINTERVAL 3m</span><br><span class="line">DYNAMICRESOLUTION</span><br><span class="line">DBOPTIONS ALLOWUNUSEDCOLUMN</span><br><span class="line">IGNOREAPPLOPS</span><br><span class="line">IGNOREREPLICATES</span><br><span class="line">FETCHOPTIONS NOUSESNAPSHOT</span><br><span class="line">FETCHOPTIONS FETCHPKUPDATECOLS</span><br><span class="line">DISCARDFILE /home/ogg/sogg/dirrpt/eora_a.dsc,APPEND,MEGABYTES 1000</span><br><span class="line">EXTTRAIL /home/ogg/sogg/dirdat/aa,MEGABYTES 100</span><br><span class="line"></span><br><span class="line">TRANLOGOPTIONS DBLOGREADER</span><br><span class="line">TRANLOGOPTIONS EXCLUDEUSER ogg</span><br><span class="line">CACHEMGR CACHEDIRECTORY /home/ogg/sogg/temp</span><br><span class="line"></span><br><span class="line">DDL INCLUDE ALL</span><br><span class="line">DDLOPTIONS ADDTRANDATA,REPORT </span><br><span class="line"></span><br><span class="line">TABLE yg1.*;</span><br><span class="line">-----------------------------------------</span><br><span class="line"></span><br><span class="line">ADD EXTRACT EORA_1, TRANLOG, BEGIN NOW, threads 1</span><br><span class="line"></span><br><span class="line">info extract *</span><br><span class="line"></span><br><span class="line">ADD EXTTRAIL /home/ogg/sogg/dirdat/aa, EXTRACT EORA_1, MEGABYTES 100</span><br><span class="line"></span><br><span class="line"><span class="comment"># 启动 extract 进程</span></span><br><span class="line">start extract eora_1</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看 extract 进程</span></span><br><span class="line">info eora_1</span><br></pre></td></tr></table></figure>
+
+<h3 id="10-配置-Pump-进程"><a href="#10-配置-Pump-进程" class="headerlink" title="10. 配置 Pump 进程"></a>10. 配置 Pump 进程</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">EDIT PARAMS PORA_1</span><br><span class="line">-----------------------------------------</span><br><span class="line">EXTRACT PORA_1</span><br><span class="line">SETENV (NLS_LANG=AMERICAN_AMERICA.UTF8)</span><br><span class="line">PASSTHRU</span><br><span class="line">NUMFILES 5000</span><br><span class="line">RMTHOST yg-ocm, MGRPORT 8809,COMPRESS</span><br><span class="line">RMTTRAIL /home/ogg/togg/dirdat/pa</span><br><span class="line">DYNAMICRESOLUTION</span><br><span class="line"></span><br><span class="line">TABLE yg1.*;</span><br><span class="line">-----------------------------------------</span><br><span class="line"></span><br><span class="line"><span class="comment"># 为pump进程指定 本地trail 和 远程trail文件</span></span><br><span class="line">ADD EXTRACT PORA_1, EXTTRAILSOURCE /home/ogg/sogg/dirdat/aa</span><br><span class="line">ADD RMTTRAIL /home/ogg/togg/dirdat/pa, EXTRACT PORA_1, MEGABYTES 100</span><br><span class="line"></span><br><span class="line">START EXTRACT PORA_1</span><br><span class="line">info all</span><br></pre></td></tr></table></figure>
+
+<h3 id="11-配置目标端的-Replicat-进程"><a href="#11-配置目标端的-Replicat-进程" class="headerlink" title="11. 配置目标端的 Replicat 进程"></a>11. 配置目标端的 Replicat 进程</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">EDIT PARAMS RORA_1</span><br><span class="line">-----------------------------------------</span><br><span class="line">REPLICAT RORA_1 </span><br><span class="line">SETENV (NLS_LANG=AMERICAN_AMERICA.UTF8)</span><br><span class="line">USERID ogg, PASSWORD oracle </span><br><span class="line">SQLEXEC <span class="string">&quot;alter session set constraints=deferred&quot;</span></span><br><span class="line">DBOPTIONS DEFERREFCONST</span><br><span class="line">GETTRUNCATES</span><br><span class="line">REPORT AT 06:00</span><br><span class="line">REPORTCOUNT EVERY 1 MINUTES,RATE</span><br><span class="line">REPORTROLLOVER AT 02:00</span><br><span class="line">REPERROR DEFAULT,ABEND</span><br><span class="line">NUMFILES 5000</span><br><span class="line">DISCARDFILE ./dirrpt/rep_a.dsc,APPEND,MEGABYTES 1024m</span><br><span class="line">DISCARDROLLOVER AT 02:00</span><br><span class="line">GROUPTRANSOPS 1000</span><br><span class="line">HANDLECOLLISIONS</span><br><span class="line">ASSUMETARGETDEFS</span><br><span class="line">ALLOWNOOPUPDATES</span><br><span class="line">DDLERROR DEFAULT IGNORE</span><br><span class="line">DDL INCLUDE MAPPED</span><br><span class="line">DDLOPTIONS REPORT</span><br><span class="line"></span><br><span class="line">MAP yg1.*, TARGET yg2.*;</span><br><span class="line">-----------------------------------------</span><br><span class="line"></span><br><span class="line">add replicat RORA_1, exttrail /home/ogg/togg/dirdat/pa </span><br><span class="line"></span><br><span class="line">start REPLICAT RORA_1</span><br><span class="line"></span><br><span class="line">info all</span><br></pre></td></tr></table></figure>
+
+<h3 id="12-测试数据同步"><a href="#12-测试数据同步" class="headerlink" title="12. 测试数据同步"></a>12. 测试数据同步</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">sqlplus yg1/oracle</span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> t <span class="keyword">as</span> <span class="keyword">select</span> * <span class="keyword">from</span> dual;</span><br><span class="line"></span><br><span class="line">sqlplus yg2/oracle</span><br><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> t;</span><br></pre></td></tr></table></figure>
+
+<p>至此，ogg-进阶1就搭建完成了，比简单的参数复杂了一些，但还是没有导入导出数据，仅仅只是做到了2个用户的数据同步，哈哈<img src="file:///C:\Users\yaogang\AppData\Local\Temp\SGPicFaceTpBq\120192\0C19E14F.png" alt="img"></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/oracle/" rel="tag"># oracle</a>
+              <a href="/tags/GoldenGate/" rel="tag"># GoldenGate</a>
+              <a href="/tags/centos/" rel="tag"># centos</a>
+              <a href="/tags/11g/" rel="tag"># 11g</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/05/11/duplicate%E5%9F%BA%E4%BA%8E%E6%BA%90%E5%BA%93rman%E5%A4%87%E4%BB%BD%E5%A4%8D%E5%88%B6%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="prev" title="duplicate db from rman backup/duplicate复制数据库">
+      <i class="fa fa-chevron-left"></i> duplicate db from rman backup/duplicate复制数据库
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/11/09/oracle-11g-%E5%90%8C%E5%BA%93%E6%90%AD%E5%BB%BA-ogg-%E8%BF%9B%E9%98%B62(GoldenGate)/" rel="next" title="oracle 11g 同库搭建 ogg-进阶2">
+      oracle 11g 同库搭建 ogg-进阶2 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#oracle-11g-%E5%90%8C%E5%BA%93%E6%90%AD%E5%BB%BA-ogg-%E8%BF%9B%E9%98%B61"><span class="nav-number">1.</span> <span class="nav-text">oracle 11g 同库搭建 ogg-进阶1</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%90%AD%E5%BB%BA%E7%8E%AF%E5%A2%83"><span class="nav-number">1.1.</span> <span class="nav-text">搭建环境</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E6%96%B0%E5%BB%BAogg%E7%94%A8%E6%88%B7"><span class="nav-number">1.1.1.</span> <span class="nav-text">1. 新建ogg用户</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E9%85%8D%E7%BD%AEogg%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F"><span class="nav-number">1.1.2.</span> <span class="nav-text">2. 配置ogg环境变量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-source%E5%92%8Ctarget%E9%83%BD%E5%87%86%E5%A4%87%E6%95%B0%E6%8D%AE%E5%BA%93"><span class="nav-number">1.1.3.</span> <span class="nav-text">3. source和target都准备数据库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E5%88%9B%E5%BB%BA-GoldenGate-%E7%9A%84%E5%B7%A5%E4%BD%9C%E7%9B%AE%E5%BD%95"><span class="nav-number">1.1.4.</span> <span class="nav-text">4. 创建 GoldenGate 的工作目录</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E6%BA%90%E7%AB%AF%E6%B7%BB%E5%8A%A0checkpointtable"><span class="nav-number">1.1.5.</span> <span class="nav-text">5. 源端添加checkpointtable</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-%E7%9B%AE%E6%A0%87%E7%AB%AF%E6%B7%BB%E5%8A%A0checkpointtable"><span class="nav-number">1.1.6.</span> <span class="nav-text">6. 目标端添加checkpointtable</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-%E6%BA%90%E9%85%8D%E7%BD%AEmgr"><span class="nav-number">1.1.7.</span> <span class="nav-text">7. 源配置mgr</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-%E7%9B%AE%E6%A0%87%E9%85%8D%E7%BD%AEmgr"><span class="nav-number">1.1.8.</span> <span class="nav-text">8. 目标配置mgr</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#9-%E6%BA%90%E7%AB%AF%E9%85%8D%E7%BD%AE-Extract-%E8%BF%9B%E7%A8%8B"><span class="nav-number">1.1.9.</span> <span class="nav-text">9. 源端配置 Extract 进程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#10-%E9%85%8D%E7%BD%AE-Pump-%E8%BF%9B%E7%A8%8B"><span class="nav-number">1.1.10.</span> <span class="nav-text">10. 配置 Pump 进程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#11-%E9%85%8D%E7%BD%AE%E7%9B%AE%E6%A0%87%E7%AB%AF%E7%9A%84-Replicat-%E8%BF%9B%E7%A8%8B"><span class="nav-number">1.1.11.</span> <span class="nav-text">11. 配置目标端的 Replicat 进程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#12-%E6%B5%8B%E8%AF%95%E6%95%B0%E6%8D%AE%E5%90%8C%E6%AD%A5"><span class="nav-number">1.1.12.</span> <span class="nav-text">12. 测试数据同步</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">姚刚</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">22</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">categories</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">32</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">姚刚</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
