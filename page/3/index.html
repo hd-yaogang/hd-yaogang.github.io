@@ -1,30 +1,30 @@
 <!DOCTYPE html>
-<html lang="zh-Hans">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 <meta name="theme-color" content="#222">
 <meta name="generator" content="Hexo 5.0.0">
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
-  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/avatar.jpg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/avatar.jpg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/avatar.jpg">
+  <link rel="mask-icon" href="/images/avatar.jpg" color="#222">
 
 <link rel="stylesheet" href="/css/main.css">
 
-
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Lato:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Roboto Mono:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
 <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"manual","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
   <meta property="og:type" content="website">
 <meta property="og:title" content="自律自由">
 <meta property="og:url" content="http://yoursite.com/page/3/index.html">
 <meta property="og:site_name" content="自律自由">
-<meta property="og:locale">
+<meta property="og:locale" content="zh_CN">
 <meta property="article:author" content="姚刚">
 <meta name="twitter:card" content="summary">
 
@@ -37,7 +37,7 @@
     sidebar: "",
     isHome : true,
     isPost : false,
-    lang   : 'zh-Hans'
+    lang   : 'zh-CN'
   };
 </script>
 
@@ -82,7 +82,7 @@
     <header class="header" itemscope itemtype="http://schema.org/WPHeader">
       <div class="header-inner"><div class="site-brand-container">
   <div class="site-nav-toggle">
-    <div class="toggle" aria-label="Toggle navigation bar">
+    <div class="toggle" aria-label="切换导航栏">
       <span class="toggle-line toggle-line-first"></span>
       <span class="toggle-line toggle-line-middle"></span>
       <span class="toggle-line toggle-line-last"></span>
@@ -101,6 +101,7 @@
 
   <div class="site-nav-right">
     <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
     </div>
   </div>
 </div>
@@ -112,29 +113,61 @@
   <ul id="menu" class="main-menu menu">
         <li class="menu-item menu-item-home">
 
-    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
 
   </li>
         <li class="menu-item menu-item-tags">
 
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
-
-  </li>
-        <li class="menu-item menu-item-categories">
-
-    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
 
   </li>
         <li class="menu-item menu-item-archives">
 
-    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
 
   </li>
+        <li class="menu-item menu-item-commonweal">
+
+    <a href="/404.html" rel="section"><i class="heartbeat fa-fw"></i>公益 404</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
   </ul>
 </nav>
 
 
 
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
 
 </div>
     </header>
@@ -144,6 +177,7 @@
     <i class="fa fa-arrow-up"></i>
     <span>0%</span>
   </div>
+  <div class="reading-progress-bar"></div>
 
 
     <main class="main">
@@ -156,7 +190,7 @@
       
   
   
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/30/oracle_1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -179,22 +213,22 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-calendar"></i>
               </span>
-              <span class="post-meta-item-text">Posted on</span>
+              <span class="post-meta-item-text">发表于</span>
 
-              <time title="Created: 2018-01-30 22:16:30" itemprop="dateCreated datePublished" datetime="2018-01-30T22:16:30+00:00">2018-01-30</time>
+              <time title="创建时间：2018-01-30 22:16:30" itemprop="dateCreated datePublished" datetime="2018-01-30T22:16:30+00:00">2018-01-30</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="far fa-calendar-check"></i>
                 </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-08-04 02:24:02" itemprop="dateModified" datetime="2020-08-04T02:24:02+00:00">2020-08-04</time>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-08-04 02:24:02" itemprop="dateModified" datetime="2020-08-04T02:24:02+00:00">2020-08-04</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
               </span>
-              <span class="post-meta-item-text">In</span>
+              <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
                   <a href="/categories/centos6/" itemprop="url" rel="index"><span itemprop="name">centos6</span></a>
                 </span>
@@ -219,111 +253,14 @@
 <h5 id="这个oracle服务是哪里来的，系统有哪些服务？"><a href="#这个oracle服务是哪里来的，系统有哪些服务？" class="headerlink" title="这个oracle服务是哪里来的，系统有哪些服务？"></a>这个oracle服务是哪里来的，系统有哪些服务？</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[oracle@srm-yg ~]$ ls &#x2F;etc&#x2F;init.d&#x2F;    #查看系统服务</span><br></pre></td></tr></table></figure>
 <p>这下面所有的可执行文件都是系统服务，你可以使用 service xxx start/stop/…  来使用它，但系统启动和关闭时不会开启和关闭所有服务。</p>
 <p>** 例子：           添加 oracle 服务 和 tomcat 服务**</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">[root@srm-yg yyy]# service tomact start               # 这里还未将tomcat添加为系统服务</span><br><span class="line">tomact: unrecognized service</span><br><span class="line"></span><br><span class="line">[root@srm-yg test_service]# ls</span><br><span class="line">tomcat</span><br><span class="line">[root@srm-yg test_service]# cp tomcat/bin/catalina.sh  /etc/init.d/tomcat</span><br><span class="line">[root@srm-yg test_service]# vim /etc/init.d/tomcat               # 在第一行后面添加：</span><br><span class="line"><span class="meta">#</span><span class="bash">!/bin/sh</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> chkconfig: 12345 80 90</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> description: srm-yg haha</span></span><br><span class="line"><span class="meta">#</span><span class="bash">CATALINA_HOME=/tmp/test_service/tomcat</span></span><br><span class="line">保存退出</span><br><span class="line"></span><br><span class="line">[root@srm-yg logs]# service tomcat start</span><br><span class="line">[root@srm-yg logs]# curl -I localhost:8080</span><br><span class="line">HTTP/1.1 200 OK</span><br><span class="line">[root@srm-yg logs]# service tomcat stop</span><br><span class="line">[root@srm-yg logs]# service tomcat run           # 这些命令都是可以的</span><br></pre></td></tr></table></figure>
-<p><strong>这里有人会也许会奇怪，一般不是就start、stop、status、restart、reload吗？怎么还有个run？</strong></p>
-<p>—–其实服务名后面跟run，跟什么都是可以的，这就得看你脚本里面怎么指定了，上面我们是把 tomcat/bin/catalina.sh 文件复制为 /etc/init.d/tomcat 文件，而catalina.sh脚本是可以接收run、debug等参数的。</p>
-<p>service xxx服务 start，这里的服务都是在 /etc/init.d/目录下面，所以当你想要使用简洁的 service服务命令去启动 某个服务的话，你只需要定义一个脚本，放到 /etc/init.d/ 目录下面，添加执行权限，脚本中再指定接收的位置参数，可以接收 start、stop、reload、hh、xxx 等等自定义参数。</p>
-<hr>
-<p><strong>那系统开机和关机执行的服务又是怎么定义呢？</strong></p>
-<h2 id="开机-和-关机"><a href="#开机-和-关机" class="headerlink" title="开机 和 关机"></a>开机 和 关机</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">[root@srm-yg init.d]# ls ..            # 这些是系统启动的服务指定的地方</span><br><span class="line">init.d  rc  rc0.d  rc1.d  rc2.d  rc3.d  rc4.d  rc5.d  rc6.d  rc.local  rc.sysinit</span><br><span class="line"></span><br><span class="line">[root@srm-yg init.d]#cat &#x2F;etc&#x2F;inittab        #  这是系统默认的运行级别</span><br><span class="line"># Default runlevel. The runlevels used are:</span><br><span class="line">#   0 - halt (Do NOT set initdefault to this)</span><br><span class="line">#   1 - Single user mode</span><br><span class="line">#   2 - Multiuser, without NFS (The same as 3, if you do not have networking)</span><br><span class="line">#   3 - Full multiuser mode</span><br><span class="line">#   4 - unused</span><br><span class="line">#   5 - X11</span><br><span class="line">#   6 - reboot (Do NOT set initdefault to this)</span><br><span class="line"># </span><br><span class="line">id:3:initdefault:</span><br></pre></td></tr></table></figure>
-<p>—-linux具有7个运行级别：0-6</p>
-<p><strong>0是关机，1是单用户，3是多用户，6是重启，这几个使我们常用的。</strong></p>
-<p>在 /etc/inittab 文件中定义了系统开机时的初始化运行级别，我虚拟机没装X图形服务，所以默认的初始化为3，如果你装了桌面，一般默认是5.</p>
-<p>当系统启动的时候会执行rc文件，这个脚本会检测当前的运行级别，然后会执行对应级别的rcX.d目录下面的SXXxx文件，例如：S80tomcat ，当系统关闭时，又会执行KXX，K开头的脚本。rc0.d-rc6.d这7个目录下的文件都是从 /etc/rc.d/init.d 目录下链接过来的，S代表系统启动时执行，K代表系统关闭时执行。</p>
-<p><strong>记得刚刚我们在 /etc/init.d/tomcat 文件中加入的3行命令吗？</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># chkconfig: 12345 80 90</span><br><span class="line"># description: srm-yg haha</span><br><span class="line">1个时服务定义，1个时服务注释</span><br><span class="line">#CATALINA_HOME&#x3D;&#x2F;tmp&#x2F;test_service&#x2F;tomcat</span><br></pre></td></tr></table></figure>
-<p>**别以为它只是注释，它可以配置 chkconfig 命令来使用， 12345 代表12345运行级别为on，未写明的0和6为 off **</p>
-<p>刚刚我们将 tomcat 的启动和停止 变成了一项系统服务，但只能手动运行，并不是开机自动运行的，现在执行下面这个命令：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@srm-yg init.d]# chkconfig --add tomcat    # 将 tomcat 服务加入运行级别</span><br></pre></td></tr></table></figure>
-<p>通过# chkconfig: 12345 80 90 的指定，系统会将我们的 /etc/init.d/tomcat 连接到rcX.d的各个目录下面，指定的为on，未指定为off。所以，在 ( rc1.d  rc2.d  rc3.d  rc4.d  rc5.d )下面会有一个从  /etc/rc.d/init.d/tomcat 链接过来的 S80tomcat 文件，在 rc0.d 和 rc6.d 目录下会有一个 K90tomca 文件，80 90分别代表启动和停止的顺序，序号越小越先执行，S代表启动时执行，K代表关闭时执行，这样你在运行12345级别时一开机系统就会按顺序，到80就启动tomcat服务了，然后运行0和6是系统会按顺序停止tomcat服务。</p>
-<blockquote>
-<p>执行S80tomcat时，系统会调用tomcat服务，并自动传递一个start参数<br>执行K90tomcat时，系统调用tomcat服务，自动传递一个stop参数</p>
-</blockquote>
-<blockquote>
-<p>chkconfig –add xxx服务<br>它会安装脚本定义的级别和开关机顺序将服务添加到系统管理</p>
-</blockquote>
-<blockquote>
-<p>我们还可以使用 chkconfig  –level 1 tomcat off 命令来更改，这样系统会把rc1.d目录下的S80tomcat，变成K90tomcat</p>
-</blockquote>
-<p><strong>还有一个文件可以做到开机启动的方法</strong></p>
-<pre><code>[root@srm-yg init.d]# vim /etc/rc.local     # 在文件中执行启动tomcat的shell命令，如下：
- /tmp/test_service/tomcat/bin/startup.sh
-&lt;!--hexoPostRenderEscape:&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;4&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;5&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;6&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;7&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;一些不重要的开机自启服务可以放在这里，但它不是系统服务，需要在rcX.d里面所有脚本按顺序执行完成后才会执行这里，而且不会关闭前执行关闭，但优点是简单。&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;---&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;## oracle配置 自启动 和 关闭&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;1. 修改oracle系统配置文件&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;:hexoPostRenderEscape--&gt;
-[oracle@srm-yg ~]$ vim /etc/oratab      #  将 N 改为 Y
-&lt;!--hexoPostRenderEscape:&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2. 在 &amp;#x2F;etc&amp;#x2F;init.d&amp;#x2F; 目录下添加 oracle启动脚本（我们公司大佬写的）&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;:hexoPostRenderEscape--&gt;
-#!/bin/sh
-# chkconfig: 2345 80 10
-# description: Oracle auto start-stop script.
-#
-# Set ORA_HOME to be equivalent to the $ORACLE_HOME
-# from which you wish to execute dbstart and dbshut;
-#
-# Set ORA_OWNER to the user id of the owner of the
-# Oracle database in ORA_HOME.
-ORA_HOME=/home/oracle/product/12.2.0/db_1
-ORA_OWNER=oracle
-if [ ! -f $ORA_HOME/bin/dbstart ]
-then
-    echo &quot;Oracle startup: cannot start&quot;
-    exit
-fi
-case &quot;$1&quot; in
-&#39;start&#39;)
-# Start the Oracle databases:
-echo &quot;Starting Oracle Databases ... &quot;
-echo &quot;-------------------------------------------------&quot; &gt;&gt; /var/log/oracle
-date +&quot; %T %a %D : Starting Oracle Databases as part of system up.&quot; &gt;&gt; /var/log/oracle
-echo &quot;-------------------------------------------------&quot; &gt;&gt; /var/log/oracle
-su - $ORA_OWNER -c &quot;$ORA_HOME/bin/dbstart&quot; &gt;&gt;/var/log/oracle
-echo &quot;Done&quot;
-# Start the Listener:
-echo &quot;Starting Oracle Listeners ... &quot;
-echo &quot;-------------------------------------------------&quot; &gt;&gt; /var/log/oracle
-date +&quot; %T %a %D : Starting Oracle Listeners as part of system up.&quot; &gt;&gt; /var/log/oracle
-echo &quot;-------------------------------------------------&quot; &gt;&gt; /var/log/oracle
-su - $ORA_OWNER -c &quot;$ORA_HOME/bin/lsnrctl start&quot; &gt;&gt;/var/log/oracle
-echo &quot;Done.&quot;
-echo &quot;-------------------------------------------------&quot; &gt;&gt; /var/log/oracle
-date +&quot; %T %a %D : Finished.&quot; &gt;&gt; /var/log/oracle
-echo &quot;-------------------------------------------------&quot; &gt;&gt; /var/log/oracle
-touch /var/lock/subsys/oracle
-;;
-&#39;stop&#39;)
-# Stop the Oracle Listener:
-echo &quot;Stoping Oracle Listeners ... &quot;
-echo &quot;-------------------------------------------------&quot; &gt;&gt; /var/log/oracle
-date +&quot; %T %a %D : Stoping Oracle Listener as part of system down.&quot; &gt;&gt; /var/log/oracle
-echo &quot;-------------------------------------------------&quot; &gt;&gt; /var/log/oracle
-su - $ORA_OWNER -c &quot;$ORA_HOME/bin/lsnrctl stop&quot; &gt;&gt;/var/log/oracle
-echo &quot;Done.&quot;
-rm -f /var/lock/subsys/oracle
-# Stop the Oracle Database:
-echo &quot;Stoping Oracle Databases ... &quot;
-echo &quot;-------------------------------------------------&quot; &gt;&gt; /var/log/oracle
-date +&quot; %T %a %D : Stoping Oracle Databases as part of system down.&quot; &gt;&gt; /var/log/oracle
-echo &quot;-------------------------------------------------&quot; &gt;&gt; /var/log/oracle
-su - $ORA_OWNER -c &quot;$ORA_HOME/bin/dbshut&quot; &gt;&gt;/var/log/oracle
-echo &quot;Done.&quot;
-echo &quot;&quot;
-echo &quot;-------------------------------------------------&quot; &gt;&gt; /var/log/oracle
-date +&quot; %T %a %D : Finished.&quot; &gt;&gt; /var/log/oracle
-echo &quot;-------------------------------------------------&quot; &gt;&gt; /var/log/oracle
-;;
-&#39;restart&#39;)
-$0 stop
-$0 start
-;;
-esac
-&lt;!--hexoPostRenderEscape:&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3. 更改脚本权限&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;:hexoPostRenderEscape--&gt;
-[root@srm-yg init.d]# chmod 755 oracle
-&lt;!--hexoPostRenderEscape:&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;4. 添加到 系统自启 和 关闭&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;:hexoPostRenderEscape--&gt;
-[root@srm-yg init.d]# chkconfig --add oracle
-```
-
-
-***
-**完毕，谢谢，其中可以还有些原理解释的不好，需要读者慢慢去揣摩脚本。。**</code></pre>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2018/01/30/oracle_1/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -341,7 +278,7 @@ esac
       
   
   
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/30/unison_1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -364,22 +301,22 @@ esac
               <span class="post-meta-item-icon">
                 <i class="far fa-calendar"></i>
               </span>
-              <span class="post-meta-item-text">Posted on</span>
+              <span class="post-meta-item-text">发表于</span>
 
-              <time title="Created: 2018-01-30 22:16:30" itemprop="dateCreated datePublished" datetime="2018-01-30T22:16:30+00:00">2018-01-30</time>
+              <time title="创建时间：2018-01-30 22:16:30" itemprop="dateCreated datePublished" datetime="2018-01-30T22:16:30+00:00">2018-01-30</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="far fa-calendar-check"></i>
                 </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-08-04 02:24:02" itemprop="dateModified" datetime="2020-08-04T02:24:02+00:00">2020-08-04</time>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-08-04 02:24:02" itemprop="dateModified" datetime="2020-08-04T02:24:02+00:00">2020-08-04</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
               </span>
-              <span class="post-meta-item-text">In</span>
+              <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
                   <a href="/categories/centos6/" itemprop="url" rel="index"><span itemprop="name">centos6</span></a>
                 </span>
@@ -409,6 +346,14 @@ esac
 <p>3、设置定时任务</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">crontab -e</span><br><span class="line">​</span><br><span class="line">*&#x2F;1 * * * * sh &#x2F;home&#x2F;srmweb&#x2F;unison&#x2F;scripts&#x2F;webapp.sh &gt;&#x2F;dev&#x2F;null 2&gt;&amp;1</span><br></pre></td></tr></table></figure>
 
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2018/01/30/unison_1/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -426,7 +371,7 @@ esac
       
   
   
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/30/cas_server/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -449,22 +394,22 @@ esac
               <span class="post-meta-item-icon">
                 <i class="far fa-calendar"></i>
               </span>
-              <span class="post-meta-item-text">Posted on</span>
+              <span class="post-meta-item-text">发表于</span>
 
-              <time title="Created: 2018-01-30 22:16:30" itemprop="dateCreated datePublished" datetime="2018-01-30T22:16:30+00:00">2018-01-30</time>
+              <time title="创建时间：2018-01-30 22:16:30" itemprop="dateCreated datePublished" datetime="2018-01-30T22:16:30+00:00">2018-01-30</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="far fa-calendar-check"></i>
                 </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-08-04 02:24:02" itemprop="dateModified" datetime="2020-08-04T02:24:02+00:00">2020-08-04</time>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-08-04 02:24:02" itemprop="dateModified" datetime="2020-08-04T02:24:02+00:00">2020-08-04</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
               </span>
-              <span class="post-meta-item-text">In</span>
+              <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
                   <a href="/categories/centos6/" itemprop="url" rel="index"><span itemprop="name">centos6</span></a>
                 </span>
@@ -491,21 +436,14 @@ esac
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">上面左边是架构图：    cas主要分为client和server，client一般拦截保护资源的访问请求重定向到cas server，再通过支持的协议进行交互，到达sso的目的。client、协议、认证方式都支持多种，比如ldap认证、数据库认证、ad认证，cas server是严重依赖spring Freamwork。</span><br><span class="line">上面右边是web流程图： 主要是browser和client和server的交互流程，偏重开发，我本次主要部署cas server。</span><br></pre></td></tr></table></figure>
 <p>####2.准备war包<br><a target="_blank" rel="noopener" href="https://blog.csdn.net/pucao_cug/article/details/69062607">参考地址</a></p>
 <p><a target="_blank" rel="noopener" href="https://github.com/apereo/cas-overlay-template/archive/4.2.zip">maven工程下载地址</a></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">1.使用eclipse导入exist的maven工程，上面下载那个</span><br><span class="line">2.修改pom.xml，加入：</span><br><span class="line">------------------------------------------------------------</span><br><span class="line">    &lt;dependencies&gt; </span><br><span class="line">        &lt;dependency&gt;</span><br><span class="line">            &lt;groupId&gt;org.jasig.cas&lt;&#x2F;groupId&gt;</span><br><span class="line">            &lt;artifactId&gt;cas-server-webapp&lt;&#x2F;artifactId&gt;</span><br><span class="line">            &lt;version&gt;$&#123;cas.version&#125;&lt;&#x2F;version&gt;</span><br><span class="line">            &lt;type&gt;war&lt;&#x2F;type&gt;</span><br><span class="line">            &lt;scope&gt;runtime&lt;&#x2F;scope&gt;</span><br><span class="line">        &lt;&#x2F;dependency&gt;</span><br><span class="line">        &lt;dependency&gt;</span><br><span class="line">            &lt;groupId&gt;mysql&lt;&#x2F;groupId&gt;</span><br><span class="line">            &lt;artifactId&gt;mysql-connector-java&lt;&#x2F;artifactId&gt;</span><br><span class="line">            &lt;version&gt;5.1.47&lt;&#x2F;version&gt;</span><br><span class="line">        &lt;&#x2F;dependency&gt;</span><br><span class="line">        &lt;dependency&gt;</span><br><span class="line">            &lt;groupId&gt;org.jasig.cas&lt;&#x2F;groupId&gt;</span><br><span class="line">            &lt;artifactId&gt;cas-server-support-jdbc&lt;&#x2F;artifactId&gt;</span><br><span class="line">            &lt;version&gt;$&#123;cas.version&#125;&lt;&#x2F;version&gt;</span><br><span class="line">        &lt;&#x2F;dependency&gt;</span><br><span class="line">    &lt;&#x2F;dependencies&gt;</span><br><span class="line">------------------------------------------------------------</span><br><span class="line">3.run as maven install（注意，这里直接添加mysql驱动，如果是oracle，由于驱动收费，maven找不到，没有自己装oracle驱动依赖，后面直接吧ojdbc6.jar放到了webapps&#x2F;cas&#x2F;WEB-INF&#x2F;lib下面即可）</span><br><span class="line">4.将jar拷贝到tomcat&#x2F;webapps下面</span><br></pre></td></tr></table></figure>
-
-<p>####3.部署war包</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">1.先配置java，注意cas越新需要依赖的java也越新，此cas4.2.7只是1.7+，我使用1.8</span><br><span class="line">2.配置tomcat https,其实使用http也行，只不过登录cas server时会有警告，但也能登录，不知道后面实现sso有没有影响</span><br><span class="line">[tomcat配置https](https:&#x2F;&#x2F;www.jianshu.com&#x2F;p&#x2F;55079be27dc3)</span><br><span class="line">3.新建默认cas配置文件：&#x2F;etc&#x2F;cas&#x2F;cas.properties 或者自定义配置文件，修改tomcat7&#x2F;webapps&#x2F;cas&#x2F;WEB-INF&#x2F;spring-configuration&#x2F;propertyFileConfigurer.xml文件最后面</span><br><span class="line">4.创建自定义用户casuser： 在cas.properties文件中增加一行配置：</span><br><span class="line">------------------------------------------------------------</span><br><span class="line">accept.authn.users&#x3D;casuser::Mellon</span><br><span class="line">------------------------------------------------------------</span><br><span class="line">5.启动tomcat，访问cas server</span><br><span class="line">http:&#x2F;&#x2F;localhost:8080&#x2F;cas&#x2F;  或者https地址  https:&#x2F;&#x2F;lcoalhost&#x2F;cas&#x2F; （前提是配置了443端口的https服务）</span><br><span class="line">使用刚刚定义的用户 casuser&#x2F;Mellon 即可显示登录成功</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>####4.配置数据库认证</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line">#mysql认证</span><br><span class="line">1.先修改tomcat7&#x2F;webapps&#x2F;cas&#x2F;WEB-INF&#x2F;deployerConfigContext.xml 配置文件</span><br><span class="line">将&lt;alias name&#x3D;&quot;acceptUsersAuthenticationHandler&quot; alias&#x3D;&quot;primaryAuthenticationHandler&quot; &#x2F;&gt; 注释</span><br><span class="line">再添加：</span><br><span class="line">------------------------------------------------------------</span><br><span class="line">&lt;bean id&#x3D;&quot;dataSource&quot;</span><br><span class="line">  class&#x3D;&quot;com.mchange.v2.c3p0.ComboPooledDataSource&quot;</span><br><span class="line">  p:driverClass&#x3D;&quot;$&#123;database.driverClass&#125;&quot;</span><br><span class="line">  p:jdbcUrl&#x3D;&quot;$&#123;database.url&#125;&quot;</span><br><span class="line">  p:user&#x3D;&quot;$&#123;database.user&#125;&quot;</span><br><span class="line">  p:password&#x3D;&quot;$&#123;database.password&#125;&quot;</span><br><span class="line">  p:initialPoolSize&#x3D;&quot;$&#123;database.pool.minSize&#125;&quot;</span><br><span class="line">  p:minPoolSize&#x3D;&quot;$&#123;database.pool.minSize&#125;&quot;</span><br><span class="line">  p:maxPoolSize&#x3D;&quot;$&#123;database.pool.maxSize&#125;&quot;</span><br><span class="line">  p:maxIdleTimeExcessConnections&#x3D;&quot;$&#123;database.pool.maxIdleTime&#125;&quot;</span><br><span class="line">  p:checkoutTimeout&#x3D;&quot;$&#123;database.pool.maxWait&#125;&quot;</span><br><span class="line">  p:acquireIncrement&#x3D;&quot;$&#123;database.pool.acquireIncrement&#125;&quot;</span><br><span class="line">  p:acquireRetryAttempts&#x3D;&quot;$&#123;database.pool.acquireRetryAttempts&#125;&quot;</span><br><span class="line">  p:acquireRetryDelay&#x3D;&quot;$&#123;database.pool.acquireRetryDelay&#125;&quot;</span><br><span class="line">  p:idleConnectionTestPeriod&#x3D;&quot;$&#123;database.pool.idleConnectionTestPeriod&#125;&quot;</span><br><span class="line">  p:preferredTestQuery&#x3D;&quot;$&#123;database.pool.connectionHealthQuery&#125;&quot; &#x2F;&gt;</span><br><span class="line"></span><br><span class="line">&lt;alias name&#x3D;&quot;defaultPasswordEncoder&quot; alias&#x3D;&quot;passwordEncoder&quot; &#x2F;&gt;</span><br><span class="line">&lt;alias name&#x3D;&quot;queryDatabaseAuthenticationHandler&quot; alias&#x3D;&quot;primaryAuthenticationHandler&quot; &#x2F;&gt;</span><br><span class="line">&lt;alias name&#x3D;&quot;dataSource&quot; alias&#x3D;&quot;queryDatabaseDataSource&quot; &#x2F;&gt;</span><br><span class="line">------------------------------------------------------------</span><br><span class="line">2.在cas.properties文件中定义数据源值</span><br><span class="line">------------------------------------------------------------</span><br><span class="line">cas.authn.password.encoding.char&#x3D;UTF-8    #配置密码编码</span><br><span class="line">cas.authn.password.encoding.alg&#x3D;MD5       #配置密码MD5加密（只会加密为小写）</span><br><span class="line">#cas.authn.password.encoding.alg&#x3D;SHA-256  #配置密码SHA-256加密</span><br><span class="line">cas.jdbc.authn.query.sql&#x3D;select pwd from cas_test where user&#x3D;?    #查询密码字段即可</span><br><span class="line">locale.default&#x3D;zh_CN    #指定首页语言</span><br><span class="line"># &#x3D;&#x3D; Basic database connection pool configuration &#x3D;&#x3D;    #c3p0连接池数据源配置</span><br><span class="line">database.driverClass&#x3D;com.mysql.jdbc.Driver</span><br><span class="line">database.url&#x3D;jdbc:mysql:&#x2F;&#x2F;10.151.0.208:3306&#x2F;multiple-srm-mobile-dev?useUnicode&#x3D;true&amp;characterEncoding&#x3D;utf8&amp;useSSL&#x3D;true</span><br><span class="line">database.user&#x3D;root</span><br><span class="line">database.password&#x3D;handhand</span><br><span class="line">database.pool.minSize&#x3D;6</span><br><span class="line">database.pool.maxSize&#x3D;18</span><br><span class="line"># Maximum amount of time to wait in ms for a connection to become</span><br><span class="line"># available when the pool is exhausted</span><br><span class="line">database.pool.maxWait&#x3D;10000</span><br><span class="line"># Amount of time in seconds after which idle connections</span><br><span class="line"># in excess of minimum size are pruned.</span><br><span class="line">database.pool.maxIdleTime&#x3D;120</span><br><span class="line"># Number of connections to obtain on pool exhaustion condition.</span><br><span class="line"># The maximum pool size is always respected when acquiring</span><br><span class="line"># new connections.</span><br><span class="line">database.pool.acquireIncrement&#x3D;6</span><br><span class="line"># &#x3D;&#x3D; Connection testing settings &#x3D;&#x3D;</span><br><span class="line"># Period in s at which a health query will be issued on idle</span><br><span class="line"># connections to determine connection liveliness.</span><br><span class="line">database.pool.idleConnectionTestPeriod&#x3D;30</span><br><span class="line"># Query executed periodically to test health</span><br><span class="line">database.pool.connectionHealthQuery&#x3D;select 1 from dual</span><br><span class="line"># &#x3D;&#x3D; Database recovery settings &#x3D;&#x3D;</span><br><span class="line"># Number of times to retry acquiring a _new_ connection</span><br><span class="line"># when an error is encountered during acquisition.</span><br><span class="line">database.pool.acquireRetryAttempts&#x3D;5</span><br><span class="line"># Amount of time in ms to wait between successive aquire retry attempts.</span><br><span class="line">database.pool.acquireRetryDelay&#x3D;2000</span><br><span class="line">------------------------------------------------------------</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">#oracle认证</span><br><span class="line">#注意前面war中已经添加了mysql驱动，oracle需要自己添加相应的驱动到WEB-INF&#x2F;lib下面</span><br><span class="line"></span><br><span class="line">1. 同样，修改tomcat7&#x2F;webapps&#x2F;cas&#x2F;WEB-INF&#x2F;deployerConfigContext.xml 配置文件</span><br><span class="line">------------------------------------------------------------</span><br><span class="line">#配置和mysql的配置一样，省略</span><br><span class="line">------------------------------------------------------------</span><br><span class="line">2. 再修改cas.properties配置文件，添加数据源的值，密码加密方式，sql查询即可（要注意12c--jdbc:oracle:thin:@127.0.0.0:1521&#x2F;xxx_dev，11g--jdbc:oracle:thin:@127.0.0.0:1521:xxx_dev）</span><br><span class="line">------------------------------------------------------------</span><br><span class="line">#accept.authn.users&#x3D;casuser::Mellon</span><br><span class="line">cas.authn.password.encoding.char&#x3D;UTF-8</span><br><span class="line">cas.authn.password.encoding.alg&#x3D;MD5</span><br><span class="line">#cas.authn.password.encoding.alg&#x3D;SHA-256</span><br><span class="line">cas.jdbc.authn.query.sql&#x3D;select lower(MD5_USER_PASSWORD) from sys_user where user_name&#x3D;upper(?)</span><br><span class="line">cas.jdbc.authn.query.encode.alg&#x3D;MD5</span><br><span class="line">locale.default&#x3D;zh_CN</span><br><span class="line">#cas.principal.transform.upperCase&#x3D;true</span><br><span class="line"># &#x3D;&#x3D; Basic database connection pool configuration &#x3D;&#x3D;</span><br><span class="line">database.driverClass&#x3D;oracle.jdbc.driver.OracleDriver</span><br><span class="line">database.url&#x3D;jdbc:oracle:thin:@127.0.0.0:1521&#x2F;xxx_dev</span><br><span class="line">database.user&#x3D;*</span><br><span class="line">database.password&#x3D;*</span><br><span class="line">database.pool.minSize&#x3D;6</span><br><span class="line">database.pool.maxSize&#x3D;18</span><br><span class="line"># Maximum amount of time to wait in ms for a connection to become</span><br><span class="line"># available when the pool is exhausted</span><br><span class="line">database.pool.maxWait&#x3D;10000</span><br><span class="line"># Amount of time in seconds after which idle connections</span><br><span class="line"># in excess of minimum size are pruned.</span><br><span class="line">database.pool.maxIdleTime&#x3D;120</span><br><span class="line"># Number of connections to obtain on pool exhaustion condition.</span><br><span class="line"># The maximum pool size is always respected when acquiring</span><br><span class="line"># new connections.</span><br><span class="line">database.pool.acquireIncrement&#x3D;6</span><br><span class="line"># &#x3D;&#x3D; Connection testing settings &#x3D;&#x3D;</span><br><span class="line"># Period in s at which a health query will be issued on idle</span><br><span class="line"># connections to determine connection liveliness.</span><br><span class="line">database.pool.idleConnectionTestPeriod&#x3D;30</span><br><span class="line"># Query executed periodically to test health</span><br><span class="line">database.pool.connectionHealthQuery&#x3D;select 1 from dual</span><br><span class="line"># &#x3D;&#x3D; Database recovery settings &#x3D;&#x3D;</span><br><span class="line"># Number of times to retry acquiring a _new_ connection</span><br><span class="line"># when an error is encountered during acquisition.</span><br><span class="line">database.pool.acquireRetryAttempts&#x3D;5</span><br><span class="line"># Amount of time in ms to wait between successive aquire retry attempts.</span><br><span class="line">database.pool.acquireRetryDelay&#x3D;2000</span><br><span class="line">------------------------------------------------------------</span><br><span class="line">#要注意cas加密的MD5密码为32位小写</span><br><span class="line"></span><br><span class="line">重启tomcat即可通过数据库密码登录成功</span><br></pre></td></tr></table></figure>
-
-
-
-
-
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2018/01/30/cas_server/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -523,7 +461,7 @@ esac
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left" aria-label="Previous page"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span>
+    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span>
   </nav>
 
 
@@ -567,10 +505,10 @@ esac
 
       <ul class="sidebar-nav motion-element">
         <li class="sidebar-nav-toc">
-          Table of Contents
+          文章目录
         </li>
         <li class="sidebar-nav-overview">
-          Overview
+          站点概览
         </li>
       </ul>
 
@@ -590,16 +528,18 @@ esac
           <a href="/archives/">
         
           <span class="site-state-item-count">23</span>
-          <span class="site-state-item-name">posts</span>
+          <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
         <span class="site-state-item-count">8</span>
-        <span class="site-state-item-name">categories</span>
+        <span class="site-state-item-name">分类</span>
       </div>
       <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
         <span class="site-state-item-count">34</span>
-        <span class="site-state-item-name">tags</span>
+        <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
 </div>
@@ -636,8 +576,20 @@ esac
   </span>
   <span class="author" itemprop="copyrightHolder">姚刚</span>
 </div>
-  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
   </div>
+
+<div class="powered-by">
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <i class="fa fa-user-md"></i>
+    <span id="busuanzi_container_site_uv">
+        本站访客数:<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span id="busuanzi_container_site_pv">
+        本站访问量<span id="busuanzi_value_site_pv"></span>
+    </span>
+</div>
 
         
 
@@ -673,6 +625,10 @@ esac
   
 
 
+
+
+  
+<script src="/js/local-search.js"></script>
 
 
 
