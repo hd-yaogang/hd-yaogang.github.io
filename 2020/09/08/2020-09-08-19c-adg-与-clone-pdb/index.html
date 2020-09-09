@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="19c adg 与 clone pdb前言​        哎，又好久没写博客  ^.^  ​        最近在客户系统作升级演练时候遇到一些dg问题，之前19c基本都是新库搭建好dg环境，然后再create新的业务pdb，或者是有一些业务pdb然后再搭建好高可用的dg环境，基本没问题。但这次由于需求，在搭建好的dg环境，进行remote hot clone pdb进入主库，备库上面的新clo">
+<meta property="og:type" content="article">
+<meta property="og:title" content="19c adg 与 clone pdb">
+<meta property="og:url" content="http://yoursite.com/2020/09/08/2020-09-08-19c-adg-%E4%B8%8E-clone-pdb/index.html">
+<meta property="og:site_name" content="自律自由">
+<meta property="og:description" content="19c adg 与 clone pdb前言​        哎，又好久没写博客  ^.^  ​        最近在客户系统作升级演练时候遇到一些dg问题，之前19c基本都是新库搭建好dg环境，然后再create新的业务pdb，或者是有一些业务pdb然后再搭建好高可用的dg环境，基本没问题。但这次由于需求，在搭建好的dg环境，进行remote hot clone pdb进入主库，备库上面的新clo">
+<meta property="og:locale">
+<meta property="article:published_time" content="2020-09-08T18:50:00.000Z">
+<meta property="article:modified_time" content="2020-09-09T02:02:57.742Z">
+<meta property="article:author" content="姚刚">
+<meta property="article:tag" content="oracle">
+<meta property="article:tag" content="pdb">
+<meta property="article:tag" content="clone">
+<meta property="article:tag" content="19c">
+<meta property="article:tag" content="dataguard">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2020/09/08/2020-09-08-19c-adg-%E4%B8%8E-clone-pdb/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>19c adg 与 clone pdb | 自律自由</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="自律自由" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">自律自由</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">yaogang</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/09/08/2020-09-08-19c-adg-%E4%B8%8E-clone-pdb/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="姚刚">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="自律自由">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          19c adg 与 clone pdb
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-09-08 18:50:00" itemprop="dateCreated datePublished" datetime="2020-09-08T18:50:00+00:00">2020-09-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-09-09 02:02:57" itemprop="dateModified" datetime="2020-09-09T02:02:57+00:00">2020-09-09</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/oracle/" itemprop="url" rel="index"><span itemprop="name">oracle</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="19c-adg-与-clone-pdb"><a href="#19c-adg-与-clone-pdb" class="headerlink" title="19c adg 与 clone pdb"></a>19c adg 与 clone pdb</h1><h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><p>​        哎，又好久没写博客  ^.^ </p>
+<p>​        最近在客户系统作升级演练时候遇到一些dg问题，之前19c基本都是新库搭建好dg环境，然后再create新的业务pdb，或者是有一些业务pdb然后再搭建好高可用的dg环境，基本没问题。但这次由于需求，在搭建好的dg环境，进行remote hot clone pdb进入主库，备库上面的新clone的pdb出现问题，以此记录一下。</p>
+<hr>
+<h4 id="一、adg主库remote-hot-clone-pdb-出错"><a href="#一、adg主库remote-hot-clone-pdb-出错" class="headerlink" title="一、adg主库remote hot clone pdb 出错"></a>一、adg主库remote hot clone pdb 出错</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 故障场景：</span></span><br><span class="line">主库和备库都是19.3 RAC，19.4 RU环境，有4个ADG备库。</span><br><span class="line">主库新建<span class="keyword">create</span>和删除pdb备库正常同步进行，然后当主库通过dblink <span class="keyword">clone</span> pdb进入cdb时，主库正常，备库正常接收日志，但是<span class="keyword">alter</span>报错，新<span class="keyword">clone</span>的pdb无法<span class="keyword">recover</span>。</span><br><span class="line"></span><br><span class="line">本次特殊的是源库<span class="number">11.2</span><span class="number">.0</span><span class="number">.4</span>升级成<span class="number">19</span>c nocdb，然后再<span class="keyword">clone</span>这个nocdb进来主库rac作为目标pdb，然后执行noncdb_to_pdb脚本转换为正常pdb。本次pdb大小<span class="number">300</span>G左右，rman压缩备份后为<span class="number">36</span>G，通过rman恢复<span class="number">40</span>分钟左右，升级到<span class="number">19</span>c耗时<span class="number">1</span>个小时左右，转为pdb耗时<span class="number">30</span>多分钟，具体时间根据库大小和机器环境配置决定。</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 发现问题</span></span><br><span class="line">当时主库clone完成后查询备库dg应用延时为零，未打开备库上面的的pdb和查看备库的alert日志，以为一切正常。结果第二天打开standby中的pdb无法正常打开为read only，报错数据文件unname，才发现备库有问题，检查备库DB_FILE_NAME_CONVERT参数正常，4个dg都有相同问题，判断应该不是dg参数有问题，估计应该是主库clone和<span class="keyword">create</span> pdb不太一样，于是谷歌，找到一篇相似的文章对<span class="number">4</span>个dg进行了修复。</span><br><span class="line"><span class="comment">-- https://codeleading.com/article/15241304236</span></span><br><span class="line"></span><br><span class="line">难道<span class="number">19</span>c adg主库不支持hot <span class="keyword">clone</span> pdb进入cdb吗？于是后面自己进行测试，被<span class="keyword">clone</span>的源库pdb状态设置为<span class="keyword">read</span> write或者<span class="keyword">read</span> <span class="keyword">only</span>都不行，库虽然不大，受限于网络带框，测试真是难受。于是细心去查看官方手册，发现在高可用章节已经明确提醒DG <span class="keyword">clone</span> pdb时需要配置额外参数了，<span class="number">19</span>c之前需要手动修复备库的<span class="keyword">datafile</span>，<span class="number">19</span>c可以设置参数自动完成<span class="keyword">standby</span> <span class="keyword">clone</span>，下面开始介绍。</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">-- 排查问题</span></span><br><span class="line"></span><br><span class="line"><span class="comment">-- standby查看主库新clone进来的pdb，一切看似正常，同步延时为0，熟不知后台已经报错了（cdb mount和open都一样会有问题）</span></span><br><span class="line"><span class="comment">-- 因为备库的这个故障pdb被认定为offline不再进行recover同步，所以cdb全局的同步延时显示为0，后台alert很明显提示了</span></span><br><span class="line">SQL&gt; show pdbs</span><br><span class="line"></span><br><span class="line">    CON_ID CON_NAME                       OPEN MODE  RESTRICTED</span><br><span class="line"><span class="comment">---------- ------------------------------ ---------- ----------</span></span><br><span class="line">         2 PDB$SEED                       READ ONLY  NO</span><br><span class="line">         3 TEST_PDB                       MOUNTED</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">SQL&gt; select value from v$dataguard_stats;</span><br><span class="line"></span><br><span class="line">VALUE</span><br><span class="line"><span class="comment">----------------------------------------------------------------</span></span><br><span class="line">+00 00:00:00</span><br><span class="line">+00 00:00:00</span><br><span class="line">+00 00:00:00.000</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">SQL&gt; select open_mode from v$database;  </span><br><span class="line"></span><br><span class="line">OPEN_MODE</span><br><span class="line"><span class="comment">--------------------</span></span><br><span class="line">READ ONLY <span class="keyword">WITH</span> <span class="keyword">APPLY</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 打开备库pdb开始报错</span></span><br><span class="line">SQL&gt; alter pluggable database all open;</span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">pluggable</span> <span class="keyword">database</span> <span class="keyword">all</span> <span class="keyword">open</span></span><br><span class="line">*</span><br><span class="line"><span class="keyword">ERROR</span> <span class="keyword">at</span> line <span class="number">1</span>:</span><br><span class="line">ORA<span class="number">-01111</span>: <span class="keyword">name</span> <span class="keyword">for</span> <span class="keyword">data</span> <span class="keyword">file</span> <span class="number">40</span> <span class="keyword">is</span> <span class="literal">unknown</span> - <span class="keyword">rename</span> <span class="keyword">to</span> correct <span class="keyword">file</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查看alert（mrp正常启动，但故障pdb无法恢复，导致不能打开）</span></span><br><span class="line">2020-08-29T09:17:30.653161+08:00</span><br><span class="line">stopping change tracking</span><br><span class="line">Warning: Datafile 40 (+DATADG/ORCLDG/ADF2FB440E69A7B3E0538387040A6468/DATAFILE/system.344.1049672939) is offline during full database recovery and will not be recovered</span><br><span class="line">Warning: Datafile 41 (+DATADG/ORCLDG/ADF2FB440E69A7B3E0538387040A6468/DATAFILE/sysaux.345.1049672939) is offline during full database recovery and will not be recovered</span><br><span class="line">Warning: Datafile 42 (+DATADG/ORCLDG/ADF2FB440E69A7B3E0538387040A6468/DATAFILE/undotbs1.325.1049672939) is offline during full database recovery and will not be recovered</span><br><span class="line">Warning: Datafile 43 (+DATADG/ORCLDG/ADF2FB440E69A7B3E0538387040A6468/DATAFILE/users.342.1049672937) is offline during full database recovery and will not be recovered</span><br><span class="line">Warning: Datafile 44 (+DATADG/ORCLDG/ADF2FB440E69A7B3E0538387040A6468/DATAFILE/undotbs2.323.1049672939) is offline during full database recovery and will not be recovered</span><br><span class="line">Warning: Datafile 45 (+DATADG/ORCLDG/ADF2FB440E69A7B3E0538387040A6468/DATAFILE/test_pdbdata.328.1049672941) is offline during full database recovery and will not be recovered</span><br><span class="line">Warning: Datafile 46 (+DATADG/ORCLDG/ADF2FB440E69A7B3E0538387040A6468/DATAFILE/test_pdbdata.329.1049672941) is offline during full database recovery and will not be recovered</span><br><span class="line">Warning: Datafile 47 (+DATADG/ORCLDG/ADF2FB440E69A7B3E0538387040A6468/DATAFILE/test_pdbdata.338.1049672943) is offline during full database recovery and will not be recovered</span><br><span class="line">Warning: Datafile 48 (+DATADG/ORCLDG/ADF2FB440E69A7B3E0538387040A6468/DATAFILE/test_pdbdata.334.1049672943) is offline during full database recovery and will not be recovered</span><br><span class="line">Warning: Datafile 49 (+DATADG/ORCLDG/ADF2FB440E69A7B3E0538387040A6468/DATAFILE/test_pdbdata.327.1049672941) is offline during full database recovery and will not be recovered</span><br><span class="line">Warning: Datafile 50 (+DATADG/ORCLDG/ADF2FB440E69A7B3E0538387040A6468/DATAFILE/test_pdbdata.326.1049672939) is offline during full database recovery and will not be recovered</span><br><span class="line">Warning: Datafile 51 (+DATADG/ORCLDG/ADF2FB440E69A7B3E0538387040A6468/DATAFILE/test_pdbdata.324.1049672939) is offline during full database recovery and will not be recovered</span><br><span class="line">Warning: Datafile 52 (+DATADG/ORCLDG/ADF2FB440E69A7B3E0538387040A6468/DATAFILE/test_pdbdata.339.1049672939) is offline during full database recovery and will not be recovered</span><br><span class="line">Warning: Datafile 53 (+DATADG/ORCLDG/ADF2FB440E69A7B3E0538387040A6468/DATAFILE/test_pdbindex.322.1049672939) is offline during full database recovery and will not be recovered</span><br><span class="line">PR00 (PID:124906): Media Recovery Waiting <span class="keyword">for</span> T-1.S-382 (<span class="keyword">in</span> transit)</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- standby datafile name查询,发现新clone的pdb文件名全是unname，并且dbs没有这些UNNAME文件</span></span><br><span class="line">SQL&gt; select name from v$datafile;</span><br><span class="line"></span><br><span class="line">NAME</span><br><span class="line"><span class="comment">----------------------------------------------------------------------------------------------------</span></span><br><span class="line">+DATADG/ORCLDG/DATAFILE/system.257.1046268257</span><br><span class="line">+DATADG/ORCLDG/DATAFILE/sysaux.258.1046268259</span><br><span class="line">+DATADG/ORCLDG/DATAFILE/undotbs1.259.1046268259</span><br><span class="line">+DATADG/ORCLDG/A379BC465D2FAAE1E0538387040AC9B3/DATAFILE/system.260.1046268259</span><br><span class="line">+DATADG/ORCLDG/A379BC465D2FAAE1E0538387040AC9B3/DATAFILE/sysaux.261.1046268267</span><br><span class="line">+DATADG/ORCLDG/DATAFILE/users.262.1046268281</span><br><span class="line">+DATADG/ORCLDG/A379BC465D2FAAE1E0538387040AC9B3/DATAFILE/undotbs1.263.1046268297</span><br><span class="line">+DATADG/ORCLDG/DATAFILE/undotbs2.264.1046268301</span><br><span class="line">+DATADG/ORCLDG/DATAFILE/sysaux.265.1046268307</span><br><span class="line">+DATADG/ORCLDG/DATAFILE/undotbs1.266.1046268343</span><br><span class="line">+DATADG/ORCLDG/DATAFILE/undotbs2.267.1046268343</span><br><span class="line"></span><br><span class="line">/u01/app/oracle/product/19.4.0/db_1/dbs/UNNAMED00040</span><br><span class="line">/u01/app/oracle/product/19.4.0/db_1/dbs/UNNAMED00041</span><br><span class="line">/u01/app/oracle/product/19.4.0/db_1/dbs/UNNAMED00042</span><br><span class="line">/u01/app/oracle/product/19.4.0/db_1/dbs/UNNAMED00043</span><br><span class="line">/u01/app/oracle/product/19.4.0/db_1/dbs/UNNAMED00044</span><br><span class="line">/u01/app/oracle/product/19.4.0/db_1/dbs/UNNAMED00045</span><br><span class="line">/u01/app/oracle/product/19.4.0/db_1/dbs/UNNAMED00046</span><br><span class="line">/u01/app/oracle/product/19.4.0/db_1/dbs/UNNAMED00047</span><br><span class="line">/u01/app/oracle/product/19.4.0/db_1/dbs/UNNAMED00048</span><br><span class="line">/u01/app/oracle/product/19.4.0/db_1/dbs/UNNAMED00049</span><br><span class="line">/u01/app/oracle/product/19.4.0/db_1/dbs/UNNAMED00050</span><br><span class="line">/u01/app/oracle/product/19.4.0/db_1/dbs/UNNAMED00051</span><br><span class="line">/u01/app/oracle/product/19.4.0/db_1/dbs/UNNAMED00052</span><br><span class="line">/u01/app/oracle/product/19.4.0/db_1/dbs/UNNAMED00053</span><br><span class="line">/u01/app/oracle/product/19.4.0/db_1/dbs/UNNAMED00054</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 回头寻找主库clone pdb时，standby的相关alert日志发现： </span></span><br><span class="line"><span class="comment"># 由于主库clone时源库为rw，或者是pdb refresh clone，或者主库clone时指定了standbys=none参数，这些特殊情况导致standby上面这个pdb为nostandby或者tablespace和datafile状态为offline，从而pdb无法进行正常恢复，filename也未正常convert进入asm，而是指向dbs下面的UNNAME文件。</span></span><br><span class="line">2020-08-28T23:54:22.012162+08:00</span><br><span class="line">Recovery created pluggable database TEST_PDB</span><br><span class="line">TEST_PDB(3):Tablespace-SYSTEM during PDB create skipped since <span class="built_in">source</span> is <span class="keyword">in</span>            r/w mode or this is a refresh <span class="built_in">clone</span></span><br><span class="line">TEST_PDB(3):File <span class="comment">#40 added to control file as &#x27;UNNAMED00040&#x27;. Originally created as:</span></span><br><span class="line">TEST_PDB(3):<span class="string">&#x27;+DATADG/ORCL/ADF2FB440E69A7B3E0538387040A6468/DATAFILE/system.341.1049672939&#x27;</span></span><br><span class="line">TEST_PDB(3):because the pluggable database was created with nostandby</span><br><span class="line">TEST_PDB(3):or the tablespace belonging to the pluggable database is</span><br><span class="line">TEST_PDB(3):offline.</span><br></pre></td></tr></table></figure>
+
+<h4 id="二、修复standby上面由于主库有问题的pdb"><a href="#二、修复standby上面由于主库有问题的pdb" class="headerlink" title="二、修复standby上面由于主库有问题的pdb"></a>二、修复standby上面由于主库有问题的pdb</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- standby停止mrp进程和故障pdb disable recovery</span></span><br><span class="line">conn / as sysdba</span><br><span class="line"><span class="keyword">show</span> parameter <span class="keyword">standby</span> <span class="comment">-- 正常一般是设置为auto</span></span><br><span class="line"><span class="keyword">recover</span> <span class="keyword">managed</span> <span class="keyword">standby</span> <span class="keyword">database</span> <span class="keyword">cancel</span>;</span><br><span class="line">ho ps -ef|grep mrp</span><br><span class="line"></span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">session</span> <span class="keyword">set</span> <span class="keyword">container</span> = test_pdb;</span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">pluggable</span> <span class="keyword">database</span> test_pdb <span class="keyword">disable</span> <span class="keyword">recovery</span>;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment"># grid asmcmd进去standby新建和主库一直的故障pdb的datadir路劲</span></span><br><span class="line">+DATADG/ORCLDG/ADF2FB440E69A7B3E0538387040A6468/DATAFILE</span><br><span class="line"></span><br><span class="line"><span class="comment"># 开始恢复故障pdb</span></span><br><span class="line"><span class="comment"># 此时cdb为mount或者open都行，pdb是mount状态因为故障无法打开，需要恢复</span></span><br><span class="line"><span class="comment"># from service 指定主库的 net service name，12c以后可以这样restore</span></span><br><span class="line">rman target /</span><br><span class="line">run &#123;</span><br><span class="line">allocate channel ch00 <span class="built_in">type</span> disk;</span><br><span class="line">allocate channel ch01 <span class="built_in">type</span> disk;</span><br><span class="line">allocate channel ch02 <span class="built_in">type</span> disk;</span><br><span class="line">allocate channel ch03 <span class="built_in">type</span> disk;</span><br><span class="line">allocate channel ch04 <span class="built_in">type</span> disk;</span><br><span class="line">allocate channel ch05 <span class="built_in">type</span> disk;</span><br><span class="line"><span class="built_in">set</span> newname <span class="keyword">for</span> pluggable database test_pdb to <span class="string">&#x27;+DATADG/ORCLDG/ADF2FB440E69A7B3E0538387040A6468/DATAFILE/%U&#x27;</span>;</span><br><span class="line">restore pluggable database test_pdb from service orcl;</span><br><span class="line">switch datafile all;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment"># 重启db</span></span><br><span class="line">shu immediate</span><br><span class="line">startup mount</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- enable pdb recover</span></span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">session</span> <span class="keyword">set</span> <span class="keyword">container</span> = test_pdb;</span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">pluggable</span> <span class="keyword">database</span> test_pdb <span class="keyword">enable</span> <span class="keyword">recovery</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- open pdb</span></span><br><span class="line">conn /as sysdba</span><br><span class="line">recover managed standby database disconnect;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 等一会恢复差不多，打开cdb和pdb</span></span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">database</span> <span class="keyword">open</span>;</span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">pluggable</span> <span class="keyword">database</span> <span class="keyword">all</span> <span class="keyword">open</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 检查pdb状态和dg延迟 </span></span><br><span class="line"><span class="keyword">show</span> pdbs</span><br><span class="line"><span class="keyword">select</span> <span class="keyword">value</span> <span class="keyword">from</span> v$dataguard_stats;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 检查pdb的tempfile，如果缺失的话手动可以手动增加，尽量和主库保持一致</span></span><br><span class="line"><span class="comment">-- 支持，故障的pdb暂时恢复了，和主库保持一致，正常了</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">-- 总结：</span></span><br><span class="line">   2种方法可以恢复，一种是如上直接<span class="keyword">restore</span> <span class="keyword">from</span> service，另一种是主库备份pdb传到<span class="keyword">standby</span>进行恢复，我两种都测试成功，但是推荐上面<span class="number">1</span>种，<span class="keyword">oracle</span>能做就给它做了，省事，自己备份、传输、恢复可能慢或者麻烦。</span><br></pre></td></tr></table></figure>
+
+<h6 id="三、19c-adg正确remote-hot-clone-pdb"><a href="#三、19c-adg正确remote-hot-clone-pdb" class="headerlink" title="三、19c adg正确remote hot clone pdb"></a>三、19c adg正确remote hot clone pdb</h6><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 1. 主库和所有dg增加相同的tns</span></span><br><span class="line"><span class="comment">-- 主库和4个DG都添加dblink使用的tns别名 ，注意有些DG网络不一定和主库相同，网段和主库不一样，需要注意</span></span><br><span class="line">orcl1522 =</span><br><span class="line">  (DESCRIPTION =</span><br><span class="line">    (ADDRESS = (PROTOCOL = TCP)(HOST = 192.168.1.131)(PORT = 1522))</span><br><span class="line">    (CONNECT_DATA =</span><br><span class="line">      (SERVER = DEDICATED)</span><br><span class="line">      (SERVICE_NAME = orcl)</span><br><span class="line">    )</span><br><span class="line">  )</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 2. 主库新建到source cdb源库的dblink</span></span><br><span class="line"><span class="keyword">create</span> <span class="keyword">public</span> <span class="keyword">database</span> <span class="keyword">link</span> dblink_cdb1522 <span class="keyword">connect</span> <span class="keyword">to</span> <span class="keyword">system</span> <span class="keyword">identified</span> <span class="keyword">by</span> <span class="keyword">oracle</span> <span class="keyword">using</span> <span class="string">&#x27;orcl1522&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 3. noncdb库或者pdb库里面赋权（注意是pdb里面授权system或者你的clone用户，不是在cdb）： </span></span><br><span class="line"><span class="keyword">grant</span> <span class="keyword">create</span> <span class="keyword">pluggable</span> <span class="keyword">database</span> <span class="keyword">to</span> <span class="keyword">system</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 4. 主库和所有DG检验dblink</span></span><br><span class="line"><span class="keyword">select</span> <span class="keyword">name</span>, db_unique_name <span class="keyword">from</span> v$<span class="keyword">database</span>@dblink_cdb1522;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 5. 打开所有DG并且设置 standby_pdb_source_file_dblink 参数为上面创建测试成功dblink</span></span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">system</span> <span class="keyword">set</span> standby_pdb_source_file_dblink = dblink_cdb1522;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 6. 需要被clone的nocdb或者pdb源库打开为read only模式</span></span><br><span class="line">shu immediate;</span><br><span class="line">statup mount;</span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">database</span> <span class="keyword">open</span> <span class="keyword">read</span> <span class="keyword">only</span>;</span><br><span class="line"><span class="comment">-- or</span></span><br><span class="line"><span class="comment">-- alter pluggable database orcl open read only;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">-- 7. 主库克隆目标pdb进入cdb库（备库也是从source通过dblink克隆，一般会比主库clone完成慢）</span></span><br><span class="line"><span class="keyword">create</span> <span class="keyword">pluggable</span> <span class="keyword">database</span> orcl_test <span class="keyword">from</span> orcl@dblink_cdb1522;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 8. 切到clone好的目标pdb库</span></span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">session</span> <span class="keyword">set</span> <span class="keyword">container</span> = orcl_test;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 如果源库是nocdb克隆过来，进去pdb执行下面脚本：  </span></span><br><span class="line"><span class="comment">-- @$ORACLE_HOME/rdbms/admin/noncdb_to_pdb.sql</span></span><br><span class="line"></span><br><span class="line"><span class="comment">-- 9. 打开目标pdb库： </span></span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">database</span> <span class="keyword">open</span>;</span><br></pre></td></tr></table></figure>
+
+<h4 id="四、standby-clone中途重启db，有个文件为unname，需要修复"><a href="#四、standby-clone中途重启db，有个文件为unname，需要修复" class="headerlink" title="四、standby clone中途重启db，有个文件为unname，需要修复"></a>四、standby clone中途重启db，有个文件为unname，需要修复</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 还是延续上面，当主库clone pdb时候备库由于非正常原因重启了，比如这次的定时调度任务，数据库shutdown卡了1.5小时才顺利完成重启，因为备库也一直在复制数据库从克隆的source库，一直未完成。但可惜的是重启后还是有一个文件有问题未正常同步过来为unname，需要手动修复。</span></span><br><span class="line"></span><br><span class="line"><span class="comment">-- standby修改控制文件缺失的unname文件名</span></span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">system</span> <span class="keyword">set</span> standby_file_management = <span class="keyword">manual</span>;</span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">session</span> <span class="keyword">set</span> <span class="keyword">container</span> = orcl_test;</span><br><span class="line"><span class="keyword">select</span> <span class="keyword">name</span> <span class="keyword">from</span> v$dbfile;</span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">database</span> <span class="keyword">create</span> <span class="keyword">datafile</span> <span class="string">&#x27;+DATADG/MUST_RENAME_THIS_DATAFILE_123.4294967295.4294967295&#x27;</span> <span class="keyword">as</span> <span class="string">&#x27;+DATADG/ORCLDG/AE3BE5CEC5283544E0538387040A76F2/DATAFILE/TEST_OGG.dbf&#x27;</span>;</span><br><span class="line"><span class="keyword">select</span> <span class="keyword">name</span> <span class="keyword">from</span> v$dbfile;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 从克隆source库拷贝出来，注意不是dg的主库，是主库clone pdb的源库，因为adg正常的clone过程备库也是通过和主库一样去source库clone，不知道是性能还是机制这样设置的，没有通过clone好的主库同步（如果文件多可以rman备份恢复过来）</span></span><br><span class="line">asmcmd cp +DATADG/ORCL/AE3BE5CEC5283544E0538387040A76F2/DATAFILE/TEST_OGG.373.1049988991 /tmp/TEST_OGG.373.1049988991</span><br><span class="line">scp /tmp/TEST_OGG.373.1049988991 192.168.100.203:/tmp/</span><br><span class="line"></span><br><span class="line"><span class="comment">-- standby手动复制进去pdb asm datafile位置</span></span><br><span class="line">asmcmd cp /tmp/TEST_OGG.373.1049988991 +DATADG/ORCLDG/AE3BE5CEC5283544E0538387040A76F2/DATAFILE/TEST_OGG.dbf</span><br><span class="line"></span><br><span class="line"><span class="comment">-- standby恢复备库的这个文件</span></span><br><span class="line">conn /as sysdba</span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">system</span> <span class="keyword">set</span> standby_file_management = <span class="keyword">auto</span>;</span><br><span class="line">recover managed standby database disconnect;</span><br><span class="line">recover managed standby database cancel;</span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">database</span> <span class="keyword">open</span>;</span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">pluggable</span> <span class="keyword">database</span> <span class="keyword">all</span> <span class="keyword">open</span>;</span><br><span class="line">recover managed standby database disconnect;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- check dg</span></span><br><span class="line"><span class="keyword">select</span> open_mode <span class="keyword">from</span> v$<span class="keyword">database</span></span><br><span class="line"><span class="keyword">union</span> <span class="keyword">all</span></span><br><span class="line"><span class="keyword">select</span> <span class="keyword">value</span> <span class="keyword">from</span> v$dataguard_stats;</span><br></pre></td></tr></table></figure>
+
+<h4 id="五、19c-standby-故障pdb删除"><a href="#五、19c-standby-故障pdb删除" class="headerlink" title="五、19c standby 故障pdb删除"></a>五、19c standby 故障pdb删除</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- standby禁用故障pdb mrp恢复</span></span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">session</span> <span class="keyword">set</span> <span class="keyword">container</span> = TEST_R17_PDB1_RD;</span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">pluggable</span> <span class="keyword">database</span> TEST_R17_PDB1_RD <span class="keyword">disable</span> <span class="keyword">recovery</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- standby取消mrp</span></span><br><span class="line">conn / as sysdba</span><br><span class="line">recover managed standby database using current logfile disconnect from session;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- primary执行</span></span><br><span class="line"><span class="keyword">drop</span> <span class="keyword">pluggable</span> <span class="keyword">database</span> TEST_R17_PDB1_RD <span class="keyword">including</span> <span class="keyword">datafiles</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 总结：</span></span><br><span class="line">standby的pdb有问题不要想着怎么去修改控制文件或者其他怎么把它删除，因为正常dg的所有ddl都是同步到standby的，所以正常主库创建和删除pdb备库都是自动同步，我们应该想办法修复dg的recover恢复同步应用，mrp同步修复好以后standby的pdb就和主库保持一致了。</span><br></pre></td></tr></table></figure>
+
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>由于当时演练，时间紧迫，就我一个人，4个备库相同的pdb都是故障状态，重建时间花费太久而且可能出错，还是考虑先修复。</p>
+<p>自己刚开始走错了路，导致耽搁了不少时间，因为备库alert日志太多，一个临时库未配置清理，alert有上千万行，一直在刷，而且看到UNNAME感觉很熟悉，可能是convert参数有问题，或者什么路劲有问题导致无法正确转换主库dbfile。于是打算standby create修复一下，但意外的是$ORACLE_HOME/dbs/下面并没有控制文件里面记录的UNNAME文件，咨询了2个大牛，决定还是create看看能不能apply恢复成功，create as花了很久，因为300多G的库。可能create需要存在实际的unname数据文件，然后复制过去，如果unname不存在强行create as 后并不能apply恢复，也不能restore或者recover from service恢复，可能只是一个空的文件。我后面是把asm文件直接手动删除了，去主库手动备份过来restore才好了。所以出问题还是要先看日志，找到为什么出问题的原因，而不能看到表象就直接上手处理，很可能会把简单问题复杂化甚至恢复不好。</p>
+<p>关于19c和adg，正常主库create pdb是没问题的，但是clone会有问题。在12和18c，主库clone pdb后，备库需要手动介入恢复备库pdb相应的数据文件，幸运的是我们现在开始从11g后直接使用19c，19c出现2个新参数和rman新命令来支持dg。</p>
+<ul>
+<li><p><strong><a target="_blank" rel="noopener" href="https://docs.oracle.com/en/database/oracle/oracle-database/19/refrn/STANDBY_PDB_SOURCE_FILE_DBLINK.html#GUID-6DDC37D4-4F61-4ABD-BEBA-23CF6FE35370">STANDBY_PDB_SOURCE_FILE_DBLINK</a>参数</strong>：  主库remote hot clone pdb时，源库设置为read only，所有dg都打开和设置这个参数为主库clone指定的dblink，当然相应tns也要配置好，这需要dg和clone的源库网络相同，这样的话dg也会去源库通过dblink clone目标pdb，克隆完成后和主库保持同步，不再需要手动介入备库，否则备库会有问题需要手动修复，这个参数在dg clone完后或者下次另外pdb clone前修改就行，或者取消掉。</p>
+</li>
+<li><p><strong><a target="_blank" rel="noopener" href="https://docs.oracle.com/en/database/oracle/oracle-database/19/refrn/STANDBY_PDB_SOURCE_FILE_DIRECTORY.html#GUID-A0822FBD-6C4F-4CCF-904B-DD4473ECCAB1">STANDBY_PDB_SOURCE_FILE_DIRECTORY</a>参数</strong>：  这个参数用来当主库plugg in pdb时，备库需要将所需要的datafile放入到这个指定目录，否则主库插入的pdb备库需要手动介入修复。</p>
+</li>
+<li><p><strong><a target="_blank" rel="noopener" href="https://docs.oracle.com/en/database/oracle/oracle-database/19/sbydb/using-RMAN-in-oracle-data-guard-configurations.html#GUID-F0EB4F8E-7D2F-4674-9A5B-AABC368D8F11">12c: restore … from service</a>命令</strong>：   从12c开始可以直接通过net重置和恢复db、pdb、ts、dbf等，这不用像11g手动去备份或者BACKUP INCREMENTAL FROM SCN增量备份来恢复dg同步。</p>
+</li>
+<li><p><strong><a target="_blank" rel="noopener" href="https://docs.oracle.com/en/database/oracle/oracle-database/19/sbydb/using-RMAN-in-oracle-data-guard-configurations.html#GUID-F0EB4F8E-7D2F-4674-9A5B-AABC368D8F11">18c: recover standby database</a>命令</strong> ：  从18c开始可以直接刷新和同步standby所有文件，也不再需要像11g手动去备份或者BACKUP INCREMENTAL FROM SCN增量备份来恢复dg同步（注意会刷新controlfile）。</p>
+</li>
+</ul>
+<p>最后还是推荐大家遇到问题也可以看看官方手册的建议和相关提醒，平时也可以多学习关于新版的特性功能，比如recover table就很简单.</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/oracle/" rel="tag"># oracle</a>
+              <a href="/tags/pdb/" rel="tag"># pdb</a>
+              <a href="/tags/clone/" rel="tag"># clone</a>
+              <a href="/tags/19c/" rel="tag"># 19c</a>
+              <a href="/tags/dataguard/" rel="tag"># dataguard</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/08/03/postgresql-%E5%90%8C%E6%9C%BA%E7%89%A9%E7%90%86%E5%BC%82%E6%AD%A5%E4%B8%BB%E5%A4%87%E5%BA%93%E6%90%AD%E5%BB%BA/" rel="prev" title="postgresql-同机物理异步主备库搭建">
+      <i class="fa fa-chevron-left"></i> postgresql-同机物理异步主备库搭建
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#19c-adg-%E4%B8%8E-clone-pdb"><span class="nav-number">1.</span> <span class="nav-text">19c adg 与 clone pdb</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.0.0.1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%80%E3%80%81adg%E4%B8%BB%E5%BA%93remote-hot-clone-pdb-%E5%87%BA%E9%94%99"><span class="nav-number">1.0.0.2.</span> <span class="nav-text">一、adg主库remote hot clone pdb 出错</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E4%BF%AE%E5%A4%8Dstandby%E4%B8%8A%E9%9D%A2%E7%94%B1%E4%BA%8E%E4%B8%BB%E5%BA%93%E6%9C%89%E9%97%AE%E9%A2%98%E7%9A%84pdb"><span class="nav-number">1.0.0.3.</span> <span class="nav-text">二、修复standby上面由于主库有问题的pdb</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#%E4%B8%89%E3%80%8119c-adg%E6%AD%A3%E7%A1%AEremote-hot-clone-pdb"><span class="nav-number">1.0.0.3.0.1.</span> <span class="nav-text">三、19c adg正确remote hot clone pdb</span></a></li></ol></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9B%9B%E3%80%81standby-clone%E4%B8%AD%E9%80%94%E9%87%8D%E5%90%AFdb%EF%BC%8C%E6%9C%89%E4%B8%AA%E6%96%87%E4%BB%B6%E4%B8%BAunname%EF%BC%8C%E9%9C%80%E8%A6%81%E4%BF%AE%E5%A4%8D"><span class="nav-number">1.0.0.4.</span> <span class="nav-text">四、standby clone中途重启db，有个文件为unname，需要修复</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BA%94%E3%80%8119c-standby-%E6%95%85%E9%9A%9Cpdb%E5%88%A0%E9%99%A4"><span class="nav-number">1.0.0.5.</span> <span class="nav-text">五、19c standby 故障pdb删除</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">1.0.0.6.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">姚刚</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">23</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">categories</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">34</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://hd-yaogang.github.io/" title="GitHub → https:&#x2F;&#x2F;hd-yaogang.github.io" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2017 – 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">姚刚</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

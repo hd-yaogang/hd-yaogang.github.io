@@ -115,6 +115,16 @@
     <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
 
   </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
         <li class="menu-item menu-item-archives">
 
     <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
@@ -143,6 +153,191 @@
 
           <div class="content index posts-expand">
             
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/30/oracle_1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="姚刚">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="自律自由">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2018/01/30/oracle_1/" class="post-title-link" itemprop="url">oracle 配置 自启动 和 关闭</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-01-30 22:16:30" itemprop="dateCreated datePublished" datetime="2018-01-30T22:16:30+00:00">2018-01-30</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-08-04 02:24:02" itemprop="dateModified" datetime="2020-08-04T02:24:02+00:00">2020-08-04</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/centos6/" itemprop="url" rel="index"><span itemprop="name">centos6</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><em>今天在看oracle自启动脚本，突然有点时间，总结一下！！！</em></p>
+<p><em>第一次写博客，大家随便看看就好，有错误麻烦提醒下，不喜欢别喷，主要是锻炼自己，形成写博客的好习惯。</em></p>
+<p><em>刚毕业，现在还没转正，在干运维和自学dba，零零碎碎学了很多东西，很早就想写博客，但没时间和懂得不够深刻全面，写了很多简单的笔记，所以从今天开始练习写博客，养成思考和坚持学习的好习惯</em></p>
+<hr>
+<h2 id="系统服务（rhel6-oracle-linux6-centos6-都一样）"><a href="#系统服务（rhel6-oracle-linux6-centos6-都一样）" class="headerlink" title="系统服务（rhel6/oracle linux6/centos6 都一样）"></a>系统服务（rhel6/oracle linux6/centos6 都一样）</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[oracle@srm-yg ~]$ service oracle start        # 将oracle启动加到系统服务</span><br></pre></td></tr></table></figure>
+<h5 id="这个oracle服务是哪里来的，系统有哪些服务？"><a href="#这个oracle服务是哪里来的，系统有哪些服务？" class="headerlink" title="这个oracle服务是哪里来的，系统有哪些服务？"></a>这个oracle服务是哪里来的，系统有哪些服务？</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[oracle@srm-yg ~]$ ls &#x2F;etc&#x2F;init.d&#x2F;    #查看系统服务</span><br></pre></td></tr></table></figure>
+<p>这下面所有的可执行文件都是系统服务，你可以使用 service xxx start/stop/…  来使用它，但系统启动和关闭时不会开启和关闭所有服务。</p>
+<p>** 例子：           添加 oracle 服务 和 tomcat 服务**</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">[root@srm-yg yyy]# service tomact start               # 这里还未将tomcat添加为系统服务</span><br><span class="line">tomact: unrecognized service</span><br><span class="line"></span><br><span class="line">[root@srm-yg test_service]# ls</span><br><span class="line">tomcat</span><br><span class="line">[root@srm-yg test_service]# cp tomcat/bin/catalina.sh  /etc/init.d/tomcat</span><br><span class="line">[root@srm-yg test_service]# vim /etc/init.d/tomcat               # 在第一行后面添加：</span><br><span class="line"><span class="meta">#</span><span class="bash">!/bin/sh</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> chkconfig: 12345 80 90</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> description: srm-yg haha</span></span><br><span class="line"><span class="meta">#</span><span class="bash">CATALINA_HOME=/tmp/test_service/tomcat</span></span><br><span class="line">保存退出</span><br><span class="line"></span><br><span class="line">[root@srm-yg logs]# service tomcat start</span><br><span class="line">[root@srm-yg logs]# curl -I localhost:8080</span><br><span class="line">HTTP/1.1 200 OK</span><br><span class="line">[root@srm-yg logs]# service tomcat stop</span><br><span class="line">[root@srm-yg logs]# service tomcat run           # 这些命令都是可以的</span><br></pre></td></tr></table></figure>
+<p><strong>这里有人会也许会奇怪，一般不是就start、stop、status、restart、reload吗？怎么还有个run？</strong></p>
+<p>—–其实服务名后面跟run，跟什么都是可以的，这就得看你脚本里面怎么指定了，上面我们是把 tomcat/bin/catalina.sh 文件复制为 /etc/init.d/tomcat 文件，而catalina.sh脚本是可以接收run、debug等参数的。</p>
+<p>service xxx服务 start，这里的服务都是在 /etc/init.d/目录下面，所以当你想要使用简洁的 service服务命令去启动 某个服务的话，你只需要定义一个脚本，放到 /etc/init.d/ 目录下面，添加执行权限，脚本中再指定接收的位置参数，可以接收 start、stop、reload、hh、xxx 等等自定义参数。</p>
+<hr>
+<p><strong>那系统开机和关机执行的服务又是怎么定义呢？</strong></p>
+<h2 id="开机-和-关机"><a href="#开机-和-关机" class="headerlink" title="开机 和 关机"></a>开机 和 关机</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">[root@srm-yg init.d]# ls ..            # 这些是系统启动的服务指定的地方</span><br><span class="line">init.d  rc  rc0.d  rc1.d  rc2.d  rc3.d  rc4.d  rc5.d  rc6.d  rc.local  rc.sysinit</span><br><span class="line"></span><br><span class="line">[root@srm-yg init.d]#cat &#x2F;etc&#x2F;inittab        #  这是系统默认的运行级别</span><br><span class="line"># Default runlevel. The runlevels used are:</span><br><span class="line">#   0 - halt (Do NOT set initdefault to this)</span><br><span class="line">#   1 - Single user mode</span><br><span class="line">#   2 - Multiuser, without NFS (The same as 3, if you do not have networking)</span><br><span class="line">#   3 - Full multiuser mode</span><br><span class="line">#   4 - unused</span><br><span class="line">#   5 - X11</span><br><span class="line">#   6 - reboot (Do NOT set initdefault to this)</span><br><span class="line"># </span><br><span class="line">id:3:initdefault:</span><br></pre></td></tr></table></figure>
+<p>—-linux具有7个运行级别：0-6</p>
+<p><strong>0是关机，1是单用户，3是多用户，6是重启，这几个使我们常用的。</strong></p>
+<p>在 /etc/inittab 文件中定义了系统开机时的初始化运行级别，我虚拟机没装X图形服务，所以默认的初始化为3，如果你装了桌面，一般默认是5.</p>
+<p>当系统启动的时候会执行rc文件，这个脚本会检测当前的运行级别，然后会执行对应级别的rcX.d目录下面的SXXxx文件，例如：S80tomcat ，当系统关闭时，又会执行KXX，K开头的脚本。rc0.d-rc6.d这7个目录下的文件都是从 /etc/rc.d/init.d 目录下链接过来的，S代表系统启动时执行，K代表系统关闭时执行。</p>
+<p><strong>记得刚刚我们在 /etc/init.d/tomcat 文件中加入的3行命令吗？</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># chkconfig: 12345 80 90</span><br><span class="line"># description: srm-yg haha</span><br><span class="line">1个时服务定义，1个时服务注释</span><br><span class="line">#CATALINA_HOME&#x3D;&#x2F;tmp&#x2F;test_service&#x2F;tomcat</span><br></pre></td></tr></table></figure>
+<p>**别以为它只是注释，它可以配置 chkconfig 命令来使用， 12345 代表12345运行级别为on，未写明的0和6为 off **</p>
+<p>刚刚我们将 tomcat 的启动和停止 变成了一项系统服务，但只能手动运行，并不是开机自动运行的，现在执行下面这个命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@srm-yg init.d]# chkconfig --add tomcat    # 将 tomcat 服务加入运行级别</span><br></pre></td></tr></table></figure>
+<p>通过# chkconfig: 12345 80 90 的指定，系统会将我们的 /etc/init.d/tomcat 连接到rcX.d的各个目录下面，指定的为on，未指定为off。所以，在 ( rc1.d  rc2.d  rc3.d  rc4.d  rc5.d )下面会有一个从  /etc/rc.d/init.d/tomcat 链接过来的 S80tomcat 文件，在 rc0.d 和 rc6.d 目录下会有一个 K90tomca 文件，80 90分别代表启动和停止的顺序，序号越小越先执行，S代表启动时执行，K代表关闭时执行，这样你在运行12345级别时一开机系统就会按顺序，到80就启动tomcat服务了，然后运行0和6是系统会按顺序停止tomcat服务。</p>
+<blockquote>
+<p>执行S80tomcat时，系统会调用tomcat服务，并自动传递一个start参数<br>执行K90tomcat时，系统调用tomcat服务，自动传递一个stop参数</p>
+</blockquote>
+<blockquote>
+<p>chkconfig –add xxx服务<br>它会安装脚本定义的级别和开关机顺序将服务添加到系统管理</p>
+</blockquote>
+<blockquote>
+<p>我们还可以使用 chkconfig  –level 1 tomcat off 命令来更改，这样系统会把rc1.d目录下的S80tomcat，变成K90tomcat</p>
+</blockquote>
+<p><strong>还有一个文件可以做到开机启动的方法</strong></p>
+<pre><code>[root@srm-yg init.d]# vim /etc/rc.local     # 在文件中执行启动tomcat的shell命令，如下：
+ /tmp/test_service/tomcat/bin/startup.sh
+&lt;!--hexoPostRenderEscape:&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;4&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;5&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;6&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;7&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;一些不重要的开机自启服务可以放在这里，但它不是系统服务，需要在rcX.d里面所有脚本按顺序执行完成后才会执行这里，而且不会关闭前执行关闭，但优点是简单。&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;---&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;## oracle配置 自启动 和 关闭&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;1. 修改oracle系统配置文件&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;:hexoPostRenderEscape--&gt;
+[oracle@srm-yg ~]$ vim /etc/oratab      #  将 N 改为 Y
+&lt;!--hexoPostRenderEscape:&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2. 在 &amp;#x2F;etc&amp;#x2F;init.d&amp;#x2F; 目录下添加 oracle启动脚本（我们公司大佬写的）&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;:hexoPostRenderEscape--&gt;
+#!/bin/sh
+# chkconfig: 2345 80 10
+# description: Oracle auto start-stop script.
+#
+# Set ORA_HOME to be equivalent to the $ORACLE_HOME
+# from which you wish to execute dbstart and dbshut;
+#
+# Set ORA_OWNER to the user id of the owner of the
+# Oracle database in ORA_HOME.
+ORA_HOME=/home/oracle/product/12.2.0/db_1
+ORA_OWNER=oracle
+if [ ! -f $ORA_HOME/bin/dbstart ]
+then
+    echo &quot;Oracle startup: cannot start&quot;
+    exit
+fi
+case &quot;$1&quot; in
+&#39;start&#39;)
+# Start the Oracle databases:
+echo &quot;Starting Oracle Databases ... &quot;
+echo &quot;-------------------------------------------------&quot; &gt;&gt; /var/log/oracle
+date +&quot; %T %a %D : Starting Oracle Databases as part of system up.&quot; &gt;&gt; /var/log/oracle
+echo &quot;-------------------------------------------------&quot; &gt;&gt; /var/log/oracle
+su - $ORA_OWNER -c &quot;$ORA_HOME/bin/dbstart&quot; &gt;&gt;/var/log/oracle
+echo &quot;Done&quot;
+# Start the Listener:
+echo &quot;Starting Oracle Listeners ... &quot;
+echo &quot;-------------------------------------------------&quot; &gt;&gt; /var/log/oracle
+date +&quot; %T %a %D : Starting Oracle Listeners as part of system up.&quot; &gt;&gt; /var/log/oracle
+echo &quot;-------------------------------------------------&quot; &gt;&gt; /var/log/oracle
+su - $ORA_OWNER -c &quot;$ORA_HOME/bin/lsnrctl start&quot; &gt;&gt;/var/log/oracle
+echo &quot;Done.&quot;
+echo &quot;-------------------------------------------------&quot; &gt;&gt; /var/log/oracle
+date +&quot; %T %a %D : Finished.&quot; &gt;&gt; /var/log/oracle
+echo &quot;-------------------------------------------------&quot; &gt;&gt; /var/log/oracle
+touch /var/lock/subsys/oracle
+;;
+&#39;stop&#39;)
+# Stop the Oracle Listener:
+echo &quot;Stoping Oracle Listeners ... &quot;
+echo &quot;-------------------------------------------------&quot; &gt;&gt; /var/log/oracle
+date +&quot; %T %a %D : Stoping Oracle Listener as part of system down.&quot; &gt;&gt; /var/log/oracle
+echo &quot;-------------------------------------------------&quot; &gt;&gt; /var/log/oracle
+su - $ORA_OWNER -c &quot;$ORA_HOME/bin/lsnrctl stop&quot; &gt;&gt;/var/log/oracle
+echo &quot;Done.&quot;
+rm -f /var/lock/subsys/oracle
+# Stop the Oracle Database:
+echo &quot;Stoping Oracle Databases ... &quot;
+echo &quot;-------------------------------------------------&quot; &gt;&gt; /var/log/oracle
+date +&quot; %T %a %D : Stoping Oracle Databases as part of system down.&quot; &gt;&gt; /var/log/oracle
+echo &quot;-------------------------------------------------&quot; &gt;&gt; /var/log/oracle
+su - $ORA_OWNER -c &quot;$ORA_HOME/bin/dbshut&quot; &gt;&gt;/var/log/oracle
+echo &quot;Done.&quot;
+echo &quot;&quot;
+echo &quot;-------------------------------------------------&quot; &gt;&gt; /var/log/oracle
+date +&quot; %T %a %D : Finished.&quot; &gt;&gt; /var/log/oracle
+echo &quot;-------------------------------------------------&quot; &gt;&gt; /var/log/oracle
+;;
+&#39;restart&#39;)
+$0 stop
+$0 start
+;;
+esac
+&lt;!--hexoPostRenderEscape:&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3. 更改脚本权限&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;:hexoPostRenderEscape--&gt;
+[root@srm-yg init.d]# chmod 755 oracle
+&lt;!--hexoPostRenderEscape:&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;4. 添加到 系统自启 和 关闭&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;:hexoPostRenderEscape--&gt;
+[root@srm-yg init.d]# chkconfig --add oracle
+```
+
+
+***
+**完毕，谢谢，其中可以还有些原理解释的不好，需要读者慢慢去揣摩脚本。。**</code></pre>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
       
   
   
@@ -394,7 +589,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">22</span>
+          <span class="site-state-item-count">23</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -403,11 +598,16 @@
         <span class="site-state-item-name">categories</span>
       </div>
       <div class="site-state-item site-state-tags">
-        <span class="site-state-item-count">32</span>
+        <span class="site-state-item-count">34</span>
         <span class="site-state-item-name">tags</span>
       </div>
   </nav>
 </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://hd-yaogang.github.io/" title="GitHub → https:&#x2F;&#x2F;hd-yaogang.github.io" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
 
 
 
@@ -429,7 +629,7 @@
 
 <div class="copyright">
   
-  &copy; 
+  &copy; 2017 – 
   <span itemprop="copyrightYear">2020</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
