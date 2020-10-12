@@ -191,6 +191,115 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/10/11/redhat7.6%20%E5%AE%89%E8%A3%85%20oracle%2012.2.0.1%20RAC%20%E5%B0%8F%E8%AE%A1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="姚刚">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="自律自由">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/10/11/redhat7.6%20%E5%AE%89%E8%A3%85%20oracle%2012.2.0.1%20RAC%20%E5%B0%8F%E8%AE%A1/" class="post-title-link" itemprop="url">redhat7.6 安装 oracle 12.2.0.1 RAC 小计</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-10-11 20:40:00" itemprop="dateCreated datePublished" datetime="2020-10-11T20:40:00+00:00">2020-10-11</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-10-12 07:47:58" itemprop="dateModified" datetime="2020-10-12T07:47:58+00:00">2020-10-12</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/oracle/" itemprop="url" rel="index"><span itemprop="name">oracle</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="redhat7-6-安装-oracle-12-2-0-1-RAC-小计"><a href="#redhat7-6-安装-oracle-12-2-0-1-RAC-小计" class="headerlink" title="redhat7.6 安装 oracle 12.2.0.1 RAC 小计"></a>redhat7.6 安装 oracle 12.2.0.1 RAC 小计</h1><h2 id="1-简介"><a href="#1-简介" class="headerlink" title="1.简介"></a>1.简介</h2><p>虽说博客能总结、提炼技能，整理思路，拓展相关知识点，但是比较浪费时间，所以自己一般小的知识点或者技巧都是喜欢笔记，遇到复杂一点，网上没有的才写一下，希望能帮到需要的人。</p>
+<p>客户这边很多11g的环境都因oracle服务支持到期，计划或者已经进行升级到19c了，但客户win8上面有几套12.2.0.1的暂时不升级，需要在Linux安装新的12.2.0.1环境对接，而且使用的服务器资源池是最新的redhat7系列，安装还是遇到了不少问题，网上大都是7.3/7.4，本次7.6不太适用，但好在最后也安装成功了，所以后续总结一下，有问题的地方欢迎帮忙指正。</p>
+<h2 id="2-环境"><a href="#2-环境" class="headerlink" title="2.环境"></a>2.环境</h2><table>
+<thead>
+<tr>
+<th>操作系统</th>
+<th>redhat 7.6</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>内核版本</td>
+<td>3.10.0-1062.9.1.el7.x86_64</td>
+</tr>
+<tr>
+<td>GI版本</td>
+<td>12.2.0.1</td>
+</tr>
+<tr>
+<td>节点数</td>
+<td>2节点</td>
+</tr>
+<tr>
+<td>安装方式</td>
+<td>静默</td>
+</tr>
+</tbody></table>
+<p>查看12.2.0.1官网gi安装redhat7操作系统要求：Red Hat Enterprise Linux 7: 3.10.0-123.el7.x86_64 or later</p>
+<p>虽然是满足的，但是此次环境的内核已经安装最新补丁升级到3.10.0-1062版本，相比123高太多，所以安装时候遇到很多问题。</p>
+<h2 id="3-GI安装"><a href="#3-GI安装" class="headerlink" title="3.GI安装"></a>3.GI安装</h2><h4 id="1-基本环境准备：略（内核参数、系统调整、用户和文件夹、存储、网络、安装介质、补丁…）"><a href="#1-基本环境准备：略（内核参数、系统调整、用户和文件夹、存储、网络、安装介质、补丁…）" class="headerlink" title="1.基本环境准备：略（内核参数、系统调整、用户和文件夹、存储、网络、安装介质、补丁…）"></a>1.基本环境准备：略（内核参数、系统调整、用户和文件夹、存储、网络、安装介质、补丁…）</h4>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/10/11/redhat7.6%20%E5%AE%89%E8%A3%85%20oracle%2012.2.0.1%20RAC%20%E5%B0%8F%E8%AE%A1/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/09/08/2020-09-08-19c-adg-%E4%B8%8E-clone-pdb/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1054,113 +1163,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/11/09/oracle-11g-%E5%90%8C%E5%BA%93%E6%90%AD%E5%BB%BA-ogg-%E8%BF%9B%E9%98%B62(GoldenGate)/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="姚刚">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="自律自由">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/11/09/oracle-11g-%E5%90%8C%E5%BA%93%E6%90%AD%E5%BB%BA-ogg-%E8%BF%9B%E9%98%B62(GoldenGate)/" class="post-title-link" itemprop="url">oracle 11g 同库搭建 ogg-进阶2</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-11-09 23:08:00" itemprop="dateCreated datePublished" datetime="2019-11-09T23:08:00+00:00">2019-11-09</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-08-04 02:24:02" itemprop="dateModified" datetime="2020-08-04T02:24:02+00:00">2020-08-04</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/oracle/" itemprop="url" rel="index"><span itemprop="name">oracle</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="oracle-11g-同库搭建-ogg-进阶2"><a href="#oracle-11g-同库搭建-ogg-进阶2" class="headerlink" title="oracle 11g 同库搭建 ogg-进阶2"></a>oracle 11g 同库搭建 ogg-进阶2</h1><p><u>本文为进阶2，比上一篇进阶1多了源库实施生成数据，主要做记录，其中配置若有误请见谅！！！</u></p>
-<p><u>此次为了方便就同机搭建，所以mgr端口不同，如果不同机搭建，mgr端口可以一致</u></p>
-<h2 id="搭建环境"><a href="#搭建环境" class="headerlink" title="搭建环境"></a>搭建环境</h2><table>
-<thead>
-<tr>
-<th>name</th>
-<th>version</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>操作系统</td>
-<td>CentOS Linux release 7.6.1810 (Core)</td>
-</tr>
-<tr>
-<td>数据库版本</td>
-<td>Oracle Database 11g Enterprise Edition Release 11.2.0.4.0 - 64bit Production</td>
-</tr>
-<tr>
-<td>ogg版本</td>
-<td>Oracle GoldenGate Version 11.2.1.0.3 14400833 OGGCORE_11.2.1.0.3_PLATFORMS_120823.1258_FBO Linux, x64, 64bi</td>
-</tr>
-</tbody></table>
-<hr>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--基本步骤</span></span><br><span class="line">1.搭建goldengate，开启mgr、extract、pump，不开启replicate</span><br><span class="line">2.查询当前scn（当前事务的最小start_time&gt;extract时间）</span><br><span class="line">3.按scn导出源库schema数据（exp/expdp）</span><br><span class="line">4.目标库导入数据</span><br><span class="line">5.检查目标trail文件中scn对应的序号和rba</span><br><span class="line">6.修改并开启rba进程</span><br><span class="line">7.检查、测试同步</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h3 id="1-新建ogg用户"><a href="#1-新建ogg用户" class="headerlink" title="1. 新建ogg用户"></a>1. 新建ogg用户</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">groupadd ogg</span><br><span class="line">useradd -g ogg -G oinstall,dba ogg</span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;oracle&quot;</span>| passwd --stdin oracle</span><br><span class="line"></span><br><span class="line"><span class="comment"># 上传oracle goldengate安装文件解压</span></span><br><span class="line">su - ogg</span><br><span class="line">rz</span><br><span class="line">mkdir sogg togg</span><br><span class="line">mkdir sogg/temp</span><br><span class="line">unzip V34339-01.zip</span><br><span class="line">tar -xf fbo_ggs_Linux_x64_ora11g_64bit.tar -C sogg/</span><br><span class="line">tar -xf fbo_ggs_Linux_x64_ora11g_64bit.tar -C togg/</span><br><span class="line"><span class="comment"># rm -f V34339-01.zip OGG_WinUnix_Rel_Notes_11.2.1.0.3.pdf  Oracle*</span></span><br></pre></td></tr></table></figure>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2019/11/09/oracle-11g-%E5%90%8C%E5%BA%93%E6%90%AD%E5%BB%BA-ogg-%E8%BF%9B%E9%98%B62(GoldenGate)/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1230,7 +1232,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">23</span>
+          <span class="site-state-item-count">24</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1241,7 +1243,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">34</span>
+        <span class="site-state-item-count">35</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/avatar.jpg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/avatar.jpg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/avatar.jpg">
+  <link rel="mask-icon" href="/images/avatar.jpg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Lato:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Roboto Mono:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"manual","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="redhat7.6 安装 oracle 12.2.0.1 RAC 小计1.简介虽说博客能总结、提炼技能，整理思路，拓展相关知识点，但是比较浪费时间，所以自己一般小的知识点或者技巧都是喜欢笔记，遇到复杂一点，网上没有的才写一下，希望能帮到需要的人。 客户这边很多11g的环境都因oracle服务支持到期，计划或者已经进行升级到19c了，但客户win8上面有几套12.2.0.1的暂时不升级，需要在Lin">
+<meta property="og:type" content="article">
+<meta property="og:title" content="redhat7.6 安装 oracle 12.2.0.1 RAC 小计">
+<meta property="og:url" content="http://yoursite.com/2020/10/11/redhat7.6%20%E5%AE%89%E8%A3%85%20oracle%2012.2.0.1%20RAC%20%E5%B0%8F%E8%AE%A1/index.html">
+<meta property="og:site_name" content="自律自由">
+<meta property="og:description" content="redhat7.6 安装 oracle 12.2.0.1 RAC 小计1.简介虽说博客能总结、提炼技能，整理思路，拓展相关知识点，但是比较浪费时间，所以自己一般小的知识点或者技巧都是喜欢笔记，遇到复杂一点，网上没有的才写一下，希望能帮到需要的人。 客户这边很多11g的环境都因oracle服务支持到期，计划或者已经进行升级到19c了，但客户win8上面有几套12.2.0.1的暂时不升级，需要在Lin">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-10-11T20:40:00.000Z">
+<meta property="article:modified_time" content="2020-10-12T07:47:58.071Z">
+<meta property="article:author" content="姚刚">
+<meta property="article:tag" content="oracle">
+<meta property="article:tag" content="rac">
+<meta property="article:tag" content="12.2">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2020/10/11/redhat7.6%20%E5%AE%89%E8%A3%85%20oracle%2012.2.0.1%20RAC%20%E5%B0%8F%E8%AE%A1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>redhat7.6 安装 oracle 12.2.0.1 RAC 小计 | 自律自由</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="自律自由" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">自律自由</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">yaogang</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-commonweal">
+
+    <a href="/404.html" rel="section"><i class="heartbeat fa-fw"></i>公益 404</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/10/11/redhat7.6%20%E5%AE%89%E8%A3%85%20oracle%2012.2.0.1%20RAC%20%E5%B0%8F%E8%AE%A1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="姚刚">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="自律自由">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          redhat7.6 安装 oracle 12.2.0.1 RAC 小计
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-10-11 20:40:00" itemprop="dateCreated datePublished" datetime="2020-10-11T20:40:00+00:00">2020-10-11</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-10-12 07:47:58" itemprop="dateModified" datetime="2020-10-12T07:47:58+00:00">2020-10-12</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/oracle/" itemprop="url" rel="index"><span itemprop="name">oracle</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="redhat7-6-安装-oracle-12-2-0-1-RAC-小计"><a href="#redhat7-6-安装-oracle-12-2-0-1-RAC-小计" class="headerlink" title="redhat7.6 安装 oracle 12.2.0.1 RAC 小计"></a>redhat7.6 安装 oracle 12.2.0.1 RAC 小计</h1><h2 id="1-简介"><a href="#1-简介" class="headerlink" title="1.简介"></a>1.简介</h2><p>虽说博客能总结、提炼技能，整理思路，拓展相关知识点，但是比较浪费时间，所以自己一般小的知识点或者技巧都是喜欢笔记，遇到复杂一点，网上没有的才写一下，希望能帮到需要的人。</p>
+<p>客户这边很多11g的环境都因oracle服务支持到期，计划或者已经进行升级到19c了，但客户win8上面有几套12.2.0.1的暂时不升级，需要在Linux安装新的12.2.0.1环境对接，而且使用的服务器资源池是最新的redhat7系列，安装还是遇到了不少问题，网上大都是7.3/7.4，本次7.6不太适用，但好在最后也安装成功了，所以后续总结一下，有问题的地方欢迎帮忙指正。</p>
+<h2 id="2-环境"><a href="#2-环境" class="headerlink" title="2.环境"></a>2.环境</h2><table>
+<thead>
+<tr>
+<th>操作系统</th>
+<th>redhat 7.6</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>内核版本</td>
+<td>3.10.0-1062.9.1.el7.x86_64</td>
+</tr>
+<tr>
+<td>GI版本</td>
+<td>12.2.0.1</td>
+</tr>
+<tr>
+<td>节点数</td>
+<td>2节点</td>
+</tr>
+<tr>
+<td>安装方式</td>
+<td>静默</td>
+</tr>
+</tbody></table>
+<p>查看12.2.0.1官网gi安装redhat7操作系统要求：Red Hat Enterprise Linux 7: 3.10.0-123.el7.x86_64 or later</p>
+<p>虽然是满足的，但是此次环境的内核已经安装最新补丁升级到3.10.0-1062版本，相比123高太多，所以安装时候遇到很多问题。</p>
+<h2 id="3-GI安装"><a href="#3-GI安装" class="headerlink" title="3.GI安装"></a>3.GI安装</h2><h4 id="1-基本环境准备：略（内核参数、系统调整、用户和文件夹、存储、网络、安装介质、补丁…）"><a href="#1-基本环境准备：略（内核参数、系统调整、用户和文件夹、存储、网络、安装介质、补丁…）" class="headerlink" title="1.基本环境准备：略（内核参数、系统调整、用户和文件夹、存储、网络、安装介质、补丁…）"></a>1.基本环境准备：略（内核参数、系统调整、用户和文件夹、存储、网络、安装介质、补丁…）</h4><h4 id="2-编辑GI安装响应文件：略"><a href="#2-编辑GI安装响应文件：略" class="headerlink" title="2.编辑GI安装响应文件：略"></a>2.编辑GI安装响应文件：略</h4><h4 id="3-安装前校验通过：略（resolve解析忽略）"><a href="#3-安装前校验通过：略（resolve解析忽略）" class="headerlink" title="3.安装前校验通过：略（resolve解析忽略）"></a>3.安装前校验通过：略（resolve解析忽略）</h4><h4 id="4-开始安装GI："><a href="#4-开始安装GI：" class="headerlink" title="4.开始安装GI："></a>4.开始安装GI：</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">./gridSetup.sh -silent -responseFile /home/grid/dba_scripts/grid.12.2.rsp -ignorePrereqFailure |tee -a /home/grid/dba_scripts/grid.install.log</span><br><span class="line"></span><br><span class="line"><span class="comment">## 介质安装完成，开始配置集群（提示需要依次执行下面3个脚本）</span></span><br><span class="line">As a root user, execute the following script(s):</span><br><span class="line">        1. /u01/app/oraInventory/orainstRoot.sh</span><br><span class="line">        2. /u01/app/12.2.0/grid/root.sh</span><br><span class="line"></span><br><span class="line">Execute /u01/app/oraInventory/orainstRoot.sh on the following nodes: </span><br><span class="line">[node01, node02]</span><br><span class="line">Execute /u01/app/12.2.0/grid/root.sh on the following nodes: </span><br><span class="line">[node01, node02]</span><br><span class="line"></span><br><span class="line">Run the script on the <span class="built_in">local</span> node first. After successful completion, you can start the script <span class="keyword">in</span> parallel on all other nodes.</span><br><span class="line"></span><br><span class="line">Successfully Setup Software.</span><br><span class="line">As install user, execute the following <span class="built_in">command</span> to complete the configuration.</span><br><span class="line">        /u01/app/12.2.0/grid/gridSetup.sh -executeConfigTools -responseFile /home/grid/dba_scripts/grid.12.2.rsp [-silent]</span><br></pre></td></tr></table></figure>
+
+<h5 id="1-执行-u01-app-12-2-0-grid-root-sh报错：CLSRSC-400-A-system-reboot-is-required-to-continue-installing"><a href="#1-执行-u01-app-12-2-0-grid-root-sh报错：CLSRSC-400-A-system-reboot-is-required-to-continue-installing" class="headerlink" title="1. 执行/u01/app/12.2.0/grid/root.sh报错：CLSRSC-400: A system reboot is required to continue installing."></a>1. 执行/u01/app/12.2.0/grid/root.sh报错：CLSRSC-400: A system reboot is required to continue installing.</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">/u01/app/oraInventory/orainstRoot.sh <span class="comment"># node01执行完成</span></span><br><span class="line">/u01/app/oraInventory/orainstRoot.sh <span class="comment"># node02执行完成</span></span><br><span class="line">/u01/app/12.2.0/grid/root.sh         <span class="comment"># node01执行报错如下：</span></span><br><span class="line"></span><br><span class="line">2020/09/25 15:57:43 CLSRSC-594: Executing installation step 13 of 19: <span class="string">&#x27;InstallAFD&#x27;</span>.</span><br><span class="line">2020/09/25 15:57:46 CLSRSC-594: Executing installation step 14 of 19: <span class="string">&#x27;InstallACFS&#x27;</span>.</span><br><span class="line">CRS-2791: Starting shutdown of Oracle High Availability Services-managed resources on <span class="string">&#x27;node01&#x27;</span></span><br><span class="line">CRS-2673: Attempting to stop <span class="string">&#x27;ora.gpnpd&#x27;</span> on <span class="string">&#x27;node01&#x27;</span></span><br><span class="line">CRS-2673: Attempting to stop <span class="string">&#x27;ora.evmd&#x27;</span> on <span class="string">&#x27;node01&#x27;</span></span><br><span class="line">CRS-2673: Attempting to stop <span class="string">&#x27;ora.mdnsd&#x27;</span> on <span class="string">&#x27;node01&#x27;</span></span><br><span class="line">CRS-2677: Stop of <span class="string">&#x27;ora.gpnpd&#x27;</span> on <span class="string">&#x27;node01&#x27;</span> succeeded</span><br><span class="line">CRS-2677: Stop of <span class="string">&#x27;ora.evmd&#x27;</span> on <span class="string">&#x27;node01&#x27;</span> succeeded</span><br><span class="line">CRS-2677: Stop of <span class="string">&#x27;ora.mdnsd&#x27;</span> on <span class="string">&#x27;node01&#x27;</span> succeeded</span><br><span class="line">CRS-2673: Attempting to stop <span class="string">&#x27;ora.gipcd&#x27;</span> on <span class="string">&#x27;node01&#x27;</span></span><br><span class="line">CRS-2677: Stop of <span class="string">&#x27;ora.gipcd&#x27;</span> on <span class="string">&#x27;node01&#x27;</span> succeeded</span><br><span class="line">CRS-2793: Shutdown of Oracle High Availability Services-managed resources on <span class="string">&#x27;node01&#x27;</span> has completed</span><br><span class="line">CRS-4133: Oracle High Availability Services has been stopped.</span><br><span class="line">CRS-4123: Oracle High Availability Services has been started.</span><br><span class="line">2020/09/25 16:00:38 CLSRSC-400: A system reboot is required to <span class="built_in">continue</span> installing.</span><br><span class="line">The <span class="built_in">command</span> <span class="string">&#x27;/u01/app/12.2.0/grid/perl/bin/perl -I/u01/app/12.2.0/grid/perl/lib -I/u01/app/12.2.0/grid/crs/install /u01/app/12.2.0/grid/crs/install/rootcrs.pl &#x27;</span> execution failed</span><br><span class="line"></span><br><span class="line"><span class="comment">## 注意： 第14步开始失败过不去，安装acfs时候，CLSRSC-400: A system reboot</span></span><br><span class="line"><span class="comment">## 我重启后继续执行root.sh，依然失败，开始谷歌。</span></span><br></pre></td></tr></table></figure>
+
+<h5 id="2-安装acfs补丁：25078431（-此次未解决）"><a href="#2-安装acfs补丁：25078431（-此次未解决）" class="headerlink" title="2.  安装acfs补丁：25078431（ 此次未解决）"></a>2.  安装acfs补丁：25078431（ 此次未解决）</h5><ul>
+<li><p>参考mos文章：Doc ID 2284463.1</p>
+</li>
+<li><p>或者参考博文：<a target="_blank" rel="noopener" href="https://yq.aliyun.com/articles/602466">RHEL7.X安装12.2RAC时root.sh错误CLSRSC-400的解决方案</a></p>
+</li>
+</ul>
+<p>​           mos文章是7.3，博文中指出是7.x，我依照安装补丁：25078431，依然不行，第14步安装acfs依然要求重启。</p>
+<p>​           我怀疑是我7.6的小版本1062实在太高了，目前所处环境比较规范严格没办法。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./gridSetup.sh -applyOneOffs /u01/software/25078431/25078431</span><br></pre></td></tr></table></figure>
+
+<h5 id="3-安装RU或者PSU后再执行root-sh报错：CLSRSC-175-Failed-to-write-the-checkpoint-‘ROOTCRS-FIRSTNODE’-with-status-‘SUCCESS’-error-code-1"><a href="#3-安装RU或者PSU后再执行root-sh报错：CLSRSC-175-Failed-to-write-the-checkpoint-‘ROOTCRS-FIRSTNODE’-with-status-‘SUCCESS’-error-code-1" class="headerlink" title="3. 安装RU或者PSU后再执行root.sh报错：CLSRSC-175: Failed to write the checkpoint ‘ROOTCRS_FIRSTNODE’ with status ‘SUCCESS’ (error code 1)"></a>3. 安装RU或者PSU后再执行root.sh报错：CLSRSC-175: Failed to write the checkpoint ‘ROOTCRS_FIRSTNODE’ with status ‘SUCCESS’ (error code 1)</h5><ul>
+<li>acfs已经不再报错，但到最后一步又报错了。</li>
+</ul>
+<p>​           本次下载RU是12.2.0.1的20181016 RU，PSU是12.2.0.1的20200714 PSU，都可以解决那个acfs要求重启的问题，并且20年7月这个PSU应该是包含18那个RU，可以先打RU再打PSU不冲突，推荐安装最新的RU或者PSU应该就好。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 安装步骤</span></span><br><span class="line"><span class="comment"># 注意： 18c gridSetup.sh开始支持RU、PSU、OneOff补丁，12c gridSetup.sh不支持RU。</span></span><br><span class="line">1. 解压gi zip到指定grid_home下面</span><br><span class="line"></span><br><span class="line">2. ./gridSetup.sh -silent -responseFile /home/grid/dba_scripts/grid.12.2.rsp -ignorePrereqFailure |tee -a /home/grid/dba_scripts/grid.install.log <span class="comment"># 2节点介质安装完成</span></span><br><span class="line"></span><br><span class="line">3. node01和node02分别替换最新的OPatch工具（因为要安装最新PSU，默认opatch版本太低）</span><br><span class="line"></span><br><span class="line">4. root用户node01执行orainstRoot.sh成功，node02执行orainstRoot.sh成功</span><br><span class="line"></span><br><span class="line">5. node01使用opatchauto安装PSU成功，node02也一样安装成功PSU： </span><br><span class="line"><span class="comment"># root 执行，注意：最新PSU 31326390下面有2个，是GI和OJVM的组合补丁，需要就指定到GI那个就行：</span></span><br><span class="line">./opatchauto apply /u01/software/31326390/31305382 -oh /u01/app/12.2.0/grid -analyze </span><br><span class="line">./opatchauto apply /u01/software/31326390/31305382 -oh /u01/app/12.2.0/grid </span><br><span class="line"></span><br><span class="line">6. node01执行root.sh，19步执行完成最后post操作报错，检查点写入失败：</span><br><span class="line">/u01/app/12.2.0/grid/root.sh</span><br><span class="line"><span class="comment">##########################################################################################</span></span><br><span class="line">CLSRSC-175: Failed to write the checkpoint <span class="string">&#x27;ROOTCRS_FIRSTNODE&#x27;</span> with status <span class="string">&#x27;SUCCESS&#x27;</span> (error code 1)</span><br><span class="line">Died at /u01/app/12.2.0/grid/crs/install/crsutils.pm line 13413.</span><br><span class="line">The <span class="built_in">command</span> <span class="string">&#x27;/u01/app/12.2.0/grid/perl/bin/perl -I/u01/app/12.2.0/grid/perl/lib -I/u01/app/12.2.0/grid/crs/install /u01/app/12.2.0/grid/crs/install/rootcrs.pl&#x27;</span> execution failed</span><br><span class="line"><span class="comment">##########################################################################################</span></span><br><span class="line">根据提示日志，查看/u01/app/12.2.0/grid/crs/install/crsutils.pm line 13413，这段代码是关于写入transfile检查点，不知道是bug还是由于gridSetup安装后，在执行root.sh之前安装PSU后影响了grid_home的完整性校验导致。</span><br><span class="line">再分析安装session日志：/u01/app/grid/crsdata/node02/crsconfig/rootcrs_node02_2020-09-28_03-55-35PM.log，发现有2个检查点报错：crs_asmbackup和transfile检查点。 继续查看这个日志中涉及的2个检查点报错日志和检查点文件，发现12c有2个检查点文件，一个是global，一个是本地node01的，crs_asmbackup检查点成功写在了global，但是本地node01检查点文件没有导致安装日志里面显示crs_asmbackup检查点报错，估计不影响可以忽略，主要问题估计还是那个transfile检查点导致，谷歌和mos无果，尝试node01再次执行root.sh。</span><br><span class="line"></span><br><span class="line">7. node01再次执行root.sh，这次成功，发现本地检查点文件里面crs_stack那个总的检查点由fail变成success了。</span><br><span class="line"><span class="comment"># 好像11g后crs安装使用检查点，所以grid安装的root.sh可以多次执行，不影响，修复相关问题后继续接着执行就行了。</span></span><br><span class="line"></span><br><span class="line">8. node02执行root.sh，报错：</span><br><span class="line"><span class="comment">##########################################################################################</span></span><br><span class="line">2020/09/28 15:55:44 CLSRSC-594: Executing installation step 1 of 19: <span class="string">&#x27;SetupTFA&#x27;</span>.</span><br><span class="line">2020/09/28 15:55:45 CLSRSC-4001: Installing Oracle Trace File Analyzer (TFA) Collector.</span><br><span class="line">2020/09/28 15:55:45 CLSRSC-4004: Failed to install Oracle Trace File Analyzer (TFA) Collector. Grid Infrastructure operations will <span class="built_in">continue</span>.</span><br><span class="line">2020/09/28 15:55:45 CLSRSC-594: Executing installation step 2 of 19: <span class="string">&#x27;ValidateEnv&#x27;</span>.</span><br><span class="line">2020/09/28 15:55:46 CLSRSC-363: User ignored prerequisites during installation</span><br><span class="line">2020/09/28 15:55:46 CLSRSC-594: Executing installation step 3 of 19: <span class="string">&#x27;CheckFirstNode&#x27;</span>.</span><br><span class="line">2020/09/28 15:55:52 CLSRSC-507: The root script cannot proceed on this node node02 because either the first-node operations have not completed on node node01 or there was an error <span class="keyword">in</span> obtaining the status of the first-node operations.</span><br><span class="line">Died at /u01/app/12.2.0/grid/crs/install/crsutils.pm line 4119.</span><br><span class="line">The <span class="built_in">command</span> <span class="string">&#x27;/u01/app/12.2.0/grid/perl/bin/perl -I/u01/app/12.2.0/grid/perl/lib -I/u01/app/12.2.0/grid/crs/install /u01/app/12.2.0/grid/crs/install/rootcrs.pl &#x27;</span> execution failed</span><br><span class="line"><span class="comment">##########################################################################################</span></span><br><span class="line"><span class="comment"># 没办法，虽然node01再次执行root.sh显示成功，但是node02执行root.sh校验node01节点依然不通过</span></span><br><span class="line"><span class="comment"># 谷歌和mos未解决，想着修改node02校验也不太好，尝试另一种方法，不管node02，先把node01安装完成，然后通过del和add把node02重新添加进入cluster。</span></span><br><span class="line"> </span><br><span class="line">9. node01执行最后配置成功：</span><br><span class="line">/u01/app/12.2.0/grid/gridSetup.sh -silent -executeConfigTools -responseFile home/grid/dba_scripts/grid.12.2.rsp</span><br><span class="line"><span class="comment"># 这一步会配置mgmt db。</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 从开始配置到安装结束，node01的$ORACLE_HOME/diag/crs/trace下面的crs日志一直未发生错误，所以判断node01应该是正常健康安装结束的。</span></span><br><span class="line"><span class="comment"># olsnodes -n :只显示了node01，node02还未加入集群。</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">有时在install或者upgrade GI时，在执行 root.sh or rootupgrade.sh or gridsetup.bat 脚本前需要先安装patch，可以使用 gridSetup.sh进行安装补丁，具体参考mos指导:  Doc ID 1410202.1</span><br><span class="line"></span><br><span class="line"><span class="comment"># 此次使用opatchauto进行PSU安装，也可以使用gridSetup.sh安装，但是RU不能使用gridSetup.sh。而且注意：可以gridSetup.sh应用补丁和进行silent安装放在一个命令执行，但我尝试时因为它先安装patch，再install GI文件，安装前会报很多关于OPatch相关的警告，因为安装补丁前替换了OPatch文件夹，而且安装补丁修改了GRID_HOME，我怕有风险，就先install，再安装PSU，最后再执行root.sh。</span></span><br></pre></td></tr></table></figure>
+
+<h5 id="4-删除node02和添加node02进入集群"><a href="#4-删除node02和添加node02进入集群" class="headerlink" title="4. 删除node02和添加node02进入集群"></a>4. 删除node02和添加node02进入集群</h5><p>参考官网：<a target="_blank" rel="noopener" href="https://docs.oracle.com/en/database/oracle/oracle-database/12.2/cwadd/adding-and-deleting-cluster-nodes.html#GUID-1965B829-795E-4977-9500-E16F1CE2A856">add and del cluster node on unix:12.2</a></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">## node02清除</span></span><br><span class="line">-----------------------------------------------------------------------------------------</span><br><span class="line"><span class="comment"># node02 grid用户执行：</span></span><br><span class="line">./deinstall -<span class="built_in">local</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># rm node02 all file</span></span><br><span class="line">rm -fr /etc/ora* /tmp/* /opt/ORCLfmap /usr/<span class="built_in">local</span>/bin/* /u01/app/oraInventory/* /u01/app/grid/* /u01/app/12.2.0/grid/* /var/tmp/.oracle/* /var/tmp/.oracle /u01/app/12.2.0/grid/.patch_storage /u01/app/12.2.0/grid/.opatchauto_storage</span><br><span class="line"></span><br><span class="line"><span class="comment"># node01 root用户执行</span></span><br><span class="line">./crsctl delete node -n node02</span><br><span class="line"></span><br><span class="line"><span class="comment"># node01 grid用户执行</span></span><br><span class="line">cluvfy stage -post nodedel -n node02 -verbose</span><br><span class="line">-----------------------------------------------------------------------------------------</span><br><span class="line"></span><br><span class="line"><span class="comment">## node02添加</span></span><br><span class="line">-----------------------------------------------------------------------------------------</span><br><span class="line"><span class="comment"># node01 grid用户执行</span></span><br><span class="line">./addnode/addnode.sh -silent <span class="string">&quot;CLUSTER_NEW_NODES=&#123;node02&#125;&quot;</span> <span class="string">&quot;CLUSTER_NEW_VIRTUAL_HOSTNAMES=&#123;node02-vip&#125;&quot;</span> <span class="string">&quot;CLUSTER_NEW_NODE_ROLES=&#123;HUB&#125;&quot;</span> -skipPrereqs -ignoreSysPrereqs -ignoreInternalDriverError </span><br><span class="line"></span><br><span class="line"><span class="comment"># node02 root用户执行</span></span><br><span class="line">/u01/app/oraInventory/orainstRoot.sh <span class="comment"># 成功</span></span><br><span class="line">/u01/app/12.2.0/grid/root.sh                 <span class="comment"># 成功</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># node01 grid用户执行</span></span><br><span class="line">cluvfy stage -post nodeadd -n node02 -verbose</span><br><span class="line">-----------------------------------------------------------------------------------------</span><br></pre></td></tr></table></figure>
+
+<h4 id="5-其他grid安装执行root-sh遇到错误："><a href="#5-其他grid安装执行root-sh遇到错误：" class="headerlink" title="5.其他grid安装执行root.sh遇到错误："></a>5.其他grid安装执行root.sh遇到错误：</h4><h5 id="1-node01执行root-sh配置olr报错：CLSRSC-169-Failed-to-create-or-upgrade-OLR"><a href="#1-node01执行root-sh配置olr报错：CLSRSC-169-Failed-to-create-or-upgrade-OLR" class="headerlink" title="1. node01执行root.sh配置olr报错：CLSRSC-169: Failed to create or upgrade OLR"></a>1. node01执行root.sh配置olr报错：CLSRSC-169: Failed to create or upgrade OLR</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">2020/09/27 14:50:29 CLSRSC-594: Executing installation step 8 of 19: <span class="string">&#x27;SetupLocalGPNP&#x27;</span>.</span><br><span class="line">2020/09/27 14:50:53 CLSRSC-594: Executing installation step 9 of 19: <span class="string">&#x27;ConfigOLR&#x27;</span>.</span><br><span class="line">PROTL-4: Failed to retrieve data from the <span class="built_in">local</span> registry</span><br><span class="line">2020/09/27 14:51:01 CLSRSC-169: Failed to create or upgrade OLR</span><br><span class="line">Died at /u01/app/12.2.0/grid/crs/install/oraolr.pm line 496.</span><br><span class="line">The <span class="built_in">command</span> <span class="string">&#x27;/u01/app/12.2.0/grid/perl/bin/perl -I/u01/app/12.2.0/grid/perl/lib -I/u01/app/12.2.0/grid/crs/install /u01/app/12.2.0/grid/crs/install/rootcrs.pl &#x27;</span> execution failed</span><br><span class="line"></span><br><span class="line"><span class="comment"># 解决：</span></span><br><span class="line"><span class="built_in">cd</span> /u01/app/12.2.0/grid/crs/install</span><br><span class="line">./rootcrs.sh -deconfig -force</span><br></pre></td></tr></table></figure>
+
+<h5 id="1-node01执行root-sh最后post报错：CLSRSC-614-failed-to-get-the-list-of-configured-diskgroups"><a href="#1-node01执行root-sh最后post报错：CLSRSC-614-failed-to-get-the-list-of-configured-diskgroups" class="headerlink" title="1. node01执行root.sh最后post报错：CLSRSC-614: failed to get the list of configured diskgroups"></a>1. node01执行root.sh最后post报错：CLSRSC-614: failed to get the list of configured diskgroups</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">2020/09/27 16:20:25 CLSRSC-594: Executing installation step 18 of 19: <span class="string">&#x27;ConfigNode&#x27;</span>.</span><br><span class="line">CRS-2672: Attempting to start <span class="string">&#x27;ora.ASMNET1LSNR_ASM.lsnr&#x27;</span> on <span class="string">&#x27;node01&#x27;</span></span><br><span class="line">CRS-2672: Attempting to start <span class="string">&#x27;ora.ASMNET2LSNR_ASM.lsnr&#x27;</span> on <span class="string">&#x27;node01&#x27;</span></span><br><span class="line">CRS-2676: Start of <span class="string">&#x27;ora.ASMNET1LSNR_ASM.lsnr&#x27;</span> on <span class="string">&#x27;node01&#x27;</span> succeeded</span><br><span class="line">CRS-2676: Start of <span class="string">&#x27;ora.ASMNET2LSNR_ASM.lsnr&#x27;</span> on <span class="string">&#x27;node01&#x27;</span> succeeded</span><br><span class="line">CRS-2672: Attempting to start <span class="string">&#x27;ora.asm&#x27;</span> on <span class="string">&#x27;node01&#x27;</span></span><br><span class="line">CRS-2676: Start of <span class="string">&#x27;ora.asm&#x27;</span> on <span class="string">&#x27;node01&#x27;</span> succeeded</span><br><span class="line">CRS-2672: Attempting to start <span class="string">&#x27;ora.OCRDG.dg&#x27;</span> on <span class="string">&#x27;node01&#x27;</span></span><br><span class="line">CRS-2676: Start of <span class="string">&#x27;ora.OCRDG.dg&#x27;</span> on <span class="string">&#x27;node01&#x27;</span> succeeded</span><br><span class="line">2020/09/27 16:21:39 CLSRSC-594: Executing installation step 19 of 19: <span class="string">&#x27;PostConfig&#x27;</span>.</span><br><span class="line">2020/09/27 16:27:13 CLSRSC-614: failed to get the list of configured diskgroups</span><br><span class="line">Died at /u01/app/12.2.0/grid/crs/install/oraasm.pm line 2069.</span><br><span class="line">The <span class="built_in">command</span> <span class="string">&#x27;/u01/app/12.2.0/grid/perl/bin/perl -I/u01/app/12.2.0/grid/perl/lib -I/u01/app/12.2.0/grid/crs/install /u01/app/12.2.0/grid/crs/install/rootcrs.pl &#x27;</span> execution failed</span><br><span class="line"></span><br><span class="line"><span class="comment"># 解决：</span></span><br><span class="line">安装最新 RU 或者 PSU</span><br></pre></td></tr></table></figure>
+
+<h4 id="6-GI安装root-sh脚本功能总结："><a href="#6-GI安装root-sh脚本功能总结：" class="headerlink" title="6.GI安装root.sh脚本功能总结："></a>6.GI安装root.sh脚本功能总结：</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">1. 完成配置集群前的一些杂项工作。</span><br><span class="line">2. 节点的初始化设置。</span><br><span class="line">3. 初始化OLR。</span><br><span class="line">4. 初始化gpnp wallet 和 gpnp profile。</span><br><span class="line">5. 配置ohasd和启动ohas。</span><br><span class="line">6. 向集群添加初始化资源。</span><br><span class="line">7. 将css启动到exclusive模式，格式化vf。</span><br><span class="line"><span class="comment">#  除了第1个运行root.sh的node外，其他node会排他启动失败然后以正常模式启动并加入集群，所以node1执行root.sh要初始化集群相比node2执行慢很多。</span></span><br><span class="line">8. 以正常模式启动集群。</span><br><span class="line">9. 向集群添加CRS相关的资源。</span><br><span class="line">10. 重新启动集群。</span><br><span class="line"></span><br><span class="line">可能还有一些新的额外的像: tfa、afd、acfs、ika等待。</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-后话"><a href="#4-后话" class="headerlink" title="4.后话"></a>4.后话</h2><p>不知道是不是头晕，安装了很多次GI，都快吐了，其中有一次居然打完PSU后，GI顺利执行root.sh完成了未报错，但是由于我失误node02未应用PSU就执行root.sh导致失败，卸载重装以后就再也不行了，node01老是最后post报错有个checkpoint写入失败，而且装了2个集群，都一样，不知道是不是bug，哈哈哈。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/oracle/" rel="tag"># oracle</a>
+              <a href="/tags/rac/" rel="tag"># rac</a>
+              <a href="/tags/12-2/" rel="tag"># 12.2</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/09/08/2020-09-08-19c-adg-%E4%B8%8E-clone-pdb/" rel="prev" title="19c adg 与 clone pdb">
+      <i class="fa fa-chevron-left"></i> 19c adg 与 clone pdb
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#redhat7-6-%E5%AE%89%E8%A3%85-oracle-12-2-0-1-RAC-%E5%B0%8F%E8%AE%A1"><span class="nav-number">1.</span> <span class="nav-text">redhat7.6 安装 oracle 12.2.0.1 RAC 小计</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E7%AE%80%E4%BB%8B"><span class="nav-number">1.1.</span> <span class="nav-text">1.简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E7%8E%AF%E5%A2%83"><span class="nav-number">1.2.</span> <span class="nav-text">2.环境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-GI%E5%AE%89%E8%A3%85"><span class="nav-number">1.3.</span> <span class="nav-text">3.GI安装</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E5%9F%BA%E6%9C%AC%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87%EF%BC%9A%E7%95%A5%EF%BC%88%E5%86%85%E6%A0%B8%E5%8F%82%E6%95%B0%E3%80%81%E7%B3%BB%E7%BB%9F%E8%B0%83%E6%95%B4%E3%80%81%E7%94%A8%E6%88%B7%E5%92%8C%E6%96%87%E4%BB%B6%E5%A4%B9%E3%80%81%E5%AD%98%E5%82%A8%E3%80%81%E7%BD%91%E7%BB%9C%E3%80%81%E5%AE%89%E8%A3%85%E4%BB%8B%E8%B4%A8%E3%80%81%E8%A1%A5%E4%B8%81%E2%80%A6%EF%BC%89"><span class="nav-number">1.3.0.1.</span> <span class="nav-text">1.基本环境准备：略（内核参数、系统调整、用户和文件夹、存储、网络、安装介质、补丁…）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E7%BC%96%E8%BE%91GI%E5%AE%89%E8%A3%85%E5%93%8D%E5%BA%94%E6%96%87%E4%BB%B6%EF%BC%9A%E7%95%A5"><span class="nav-number">1.3.0.2.</span> <span class="nav-text">2.编辑GI安装响应文件：略</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-%E5%AE%89%E8%A3%85%E5%89%8D%E6%A0%A1%E9%AA%8C%E9%80%9A%E8%BF%87%EF%BC%9A%E7%95%A5%EF%BC%88resolve%E8%A7%A3%E6%9E%90%E5%BF%BD%E7%95%A5%EF%BC%89"><span class="nav-number">1.3.0.3.</span> <span class="nav-text">3.安装前校验通过：略（resolve解析忽略）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-%E5%BC%80%E5%A7%8B%E5%AE%89%E8%A3%85GI%EF%BC%9A"><span class="nav-number">1.3.0.4.</span> <span class="nav-text">4.开始安装GI：</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-%E6%89%A7%E8%A1%8C-u01-app-12-2-0-grid-root-sh%E6%8A%A5%E9%94%99%EF%BC%9ACLSRSC-400-A-system-reboot-is-required-to-continue-installing"><span class="nav-number">1.3.0.4.1.</span> <span class="nav-text">1. 执行&#x2F;u01&#x2F;app&#x2F;12.2.0&#x2F;grid&#x2F;root.sh报错：CLSRSC-400: A system reboot is required to continue installing.</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-%E5%AE%89%E8%A3%85acfs%E8%A1%A5%E4%B8%81%EF%BC%9A25078431%EF%BC%88-%E6%AD%A4%E6%AC%A1%E6%9C%AA%E8%A7%A3%E5%86%B3%EF%BC%89"><span class="nav-number">1.3.0.4.2.</span> <span class="nav-text">2.  安装acfs补丁：25078431（ 此次未解决）</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-%E5%AE%89%E8%A3%85RU%E6%88%96%E8%80%85PSU%E5%90%8E%E5%86%8D%E6%89%A7%E8%A1%8Croot-sh%E6%8A%A5%E9%94%99%EF%BC%9ACLSRSC-175-Failed-to-write-the-checkpoint-%E2%80%98ROOTCRS-FIRSTNODE%E2%80%99-with-status-%E2%80%98SUCCESS%E2%80%99-error-code-1"><span class="nav-number">1.3.0.4.3.</span> <span class="nav-text">3. 安装RU或者PSU后再执行root.sh报错：CLSRSC-175: Failed to write the checkpoint ‘ROOTCRS_FIRSTNODE’ with status ‘SUCCESS’ (error code 1)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-%E5%88%A0%E9%99%A4node02%E5%92%8C%E6%B7%BB%E5%8A%A0node02%E8%BF%9B%E5%85%A5%E9%9B%86%E7%BE%A4"><span class="nav-number">1.3.0.4.4.</span> <span class="nav-text">4. 删除node02和添加node02进入集群</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-%E5%85%B6%E4%BB%96grid%E5%AE%89%E8%A3%85%E6%89%A7%E8%A1%8Croot-sh%E9%81%87%E5%88%B0%E9%94%99%E8%AF%AF%EF%BC%9A"><span class="nav-number">1.3.0.5.</span> <span class="nav-text">5.其他grid安装执行root.sh遇到错误：</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-node01%E6%89%A7%E8%A1%8Croot-sh%E9%85%8D%E7%BD%AEolr%E6%8A%A5%E9%94%99%EF%BC%9ACLSRSC-169-Failed-to-create-or-upgrade-OLR"><span class="nav-number">1.3.0.5.1.</span> <span class="nav-text">1. node01执行root.sh配置olr报错：CLSRSC-169: Failed to create or upgrade OLR</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#1-node01%E6%89%A7%E8%A1%8Croot-sh%E6%9C%80%E5%90%8Epost%E6%8A%A5%E9%94%99%EF%BC%9ACLSRSC-614-failed-to-get-the-list-of-configured-diskgroups"><span class="nav-number">1.3.0.5.2.</span> <span class="nav-text">1. node01执行root.sh最后post报错：CLSRSC-614: failed to get the list of configured diskgroups</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-GI%E5%AE%89%E8%A3%85root-sh%E8%84%9A%E6%9C%AC%E5%8A%9F%E8%83%BD%E6%80%BB%E7%BB%93%EF%BC%9A"><span class="nav-number">1.3.0.6.</span> <span class="nav-text">6.GI安装root.sh脚本功能总结：</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E5%90%8E%E8%AF%9D"><span class="nav-number">1.4.</span> <span class="nav-text">4.后话</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">姚刚</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">24</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">35</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://hd-yaogang.github.io/" title="GitHub → https:&#x2F;&#x2F;hd-yaogang.github.io" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2017 – 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">姚刚</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+<div class="powered-by">
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <i class="fa fa-user-md"></i>
+    <span id="busuanzi_container_site_uv">
+        本站访客数:<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span id="busuanzi_container_site_pv">
+        本站访问量<span id="busuanzi_value_site_pv"></span>
+    </span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

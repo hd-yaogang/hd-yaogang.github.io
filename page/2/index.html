@@ -191,6 +191,113 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/11/09/oracle-11g-%E5%90%8C%E5%BA%93%E6%90%AD%E5%BB%BA-ogg-%E8%BF%9B%E9%98%B62(GoldenGate)/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="姚刚">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="自律自由">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/11/09/oracle-11g-%E5%90%8C%E5%BA%93%E6%90%AD%E5%BB%BA-ogg-%E8%BF%9B%E9%98%B62(GoldenGate)/" class="post-title-link" itemprop="url">oracle 11g 同库搭建 ogg-进阶2</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-11-09 23:08:00" itemprop="dateCreated datePublished" datetime="2019-11-09T23:08:00+00:00">2019-11-09</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-08-04 02:24:02" itemprop="dateModified" datetime="2020-08-04T02:24:02+00:00">2020-08-04</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/oracle/" itemprop="url" rel="index"><span itemprop="name">oracle</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="oracle-11g-同库搭建-ogg-进阶2"><a href="#oracle-11g-同库搭建-ogg-进阶2" class="headerlink" title="oracle 11g 同库搭建 ogg-进阶2"></a>oracle 11g 同库搭建 ogg-进阶2</h1><p><u>本文为进阶2，比上一篇进阶1多了源库实施生成数据，主要做记录，其中配置若有误请见谅！！！</u></p>
+<p><u>此次为了方便就同机搭建，所以mgr端口不同，如果不同机搭建，mgr端口可以一致</u></p>
+<h2 id="搭建环境"><a href="#搭建环境" class="headerlink" title="搭建环境"></a>搭建环境</h2><table>
+<thead>
+<tr>
+<th>name</th>
+<th>version</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>操作系统</td>
+<td>CentOS Linux release 7.6.1810 (Core)</td>
+</tr>
+<tr>
+<td>数据库版本</td>
+<td>Oracle Database 11g Enterprise Edition Release 11.2.0.4.0 - 64bit Production</td>
+</tr>
+<tr>
+<td>ogg版本</td>
+<td>Oracle GoldenGate Version 11.2.1.0.3 14400833 OGGCORE_11.2.1.0.3_PLATFORMS_120823.1258_FBO Linux, x64, 64bi</td>
+</tr>
+</tbody></table>
+<hr>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--基本步骤</span></span><br><span class="line">1.搭建goldengate，开启mgr、extract、pump，不开启replicate</span><br><span class="line">2.查询当前scn（当前事务的最小start_time&gt;extract时间）</span><br><span class="line">3.按scn导出源库schema数据（exp/expdp）</span><br><span class="line">4.目标库导入数据</span><br><span class="line">5.检查目标trail文件中scn对应的序号和rba</span><br><span class="line">6.修改并开启rba进程</span><br><span class="line">7.检查、测试同步</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="1-新建ogg用户"><a href="#1-新建ogg用户" class="headerlink" title="1. 新建ogg用户"></a>1. 新建ogg用户</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">groupadd ogg</span><br><span class="line">useradd -g ogg -G oinstall,dba ogg</span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;oracle&quot;</span>| passwd --stdin oracle</span><br><span class="line"></span><br><span class="line"><span class="comment"># 上传oracle goldengate安装文件解压</span></span><br><span class="line">su - ogg</span><br><span class="line">rz</span><br><span class="line">mkdir sogg togg</span><br><span class="line">mkdir sogg/temp</span><br><span class="line">unzip V34339-01.zip</span><br><span class="line">tar -xf fbo_ggs_Linux_x64_ora11g_64bit.tar -C sogg/</span><br><span class="line">tar -xf fbo_ggs_Linux_x64_ora11g_64bit.tar -C togg/</span><br><span class="line"><span class="comment"># rm -f V34339-01.zip OGG_WinUnix_Rel_Notes_11.2.1.0.3.pdf  Oracle*</span></span><br></pre></td></tr></table></figure>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2019/11/09/oracle-11g-%E5%90%8C%E5%BA%93%E6%90%AD%E5%BB%BA-ogg-%E8%BF%9B%E9%98%B62(GoldenGate)/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/11/09/oracle-11g-%E5%90%8C%E5%BA%93%E6%90%AD%E5%BB%BA-ogg-%E8%BF%9B%E9%98%B61(GoldenGate)/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1195,101 +1302,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/31/hexo_deploy/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="姚刚">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="自律自由">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2018/01/31/hexo_deploy/" class="post-title-link" itemprop="url">hexo+githup 个人博客搭建</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2018-01-31 19:00:00" itemprop="dateCreated datePublished" datetime="2018-01-31T19:00:00+00:00">2018-01-31</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-08-04 02:24:02" itemprop="dateModified" datetime="2020-08-04T02:24:02+00:00">2020-08-04</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/centos6/" itemprop="url" rel="index"><span itemprop="name">centos6</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="闲话"><a href="#闲话" class="headerlink" title="闲话"></a>闲话</h2><p><strong>优点：</strong></p>
-<ul>
-<li>快速高效</li>
-<li>支持markdown</li>
-<li>布局自定义简单，无广告</li>
-<li>部署简单</li>
-</ul>
-<hr>
-<p><em>因为想开始写博客，但又找不到好的博客平台，平时都看博客园和开源中国看博客文章，但博客园的那个皮肤是真有点难受，所以就想自己打个博客平台用着，然后blog的话还是发表到博客园，博客园叫 姚刚，有兴趣的关注一下，以后会出一些关于运维和oracle的文章</em></p>
-<hr>
-<p>**本次环境：<br>个人笔记本+centos6.9 + node.js v8.9.4 + theme（NexT.Mist v5.1.4）+ githup + gitment **</p>
-<blockquote>
-<p>因为第一次开始搭建，主要记录一下操作步骤，可能对原理和其他分析不太全面，请原谅，有不当的或错误的见解希望指正。反正博客刚开始也没有访问量，所以就不打算购买域名，将个人博客部署到githup就好。</p>
-</blockquote>
-<h2 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h2><h3 id="安装git"><a href="#安装git" class="headerlink" title="安装git"></a>安装git</h3>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2018/01/31/hexo_deploy/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1359,7 +1371,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">23</span>
+          <span class="site-state-item-count">24</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1370,7 +1382,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">34</span>
+        <span class="site-state-item-count">35</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
