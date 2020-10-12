@@ -191,6 +191,109 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/10/12/xag%20%E9%85%8D%E7%BD%AEogg%E9%AB%98%E5%8F%AF%E7%94%A8%E7%AE%80%E5%8D%95%E4%BB%8B%E7%BB%8D/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="姚刚">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="自律自由">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/10/12/xag%20%E9%85%8D%E7%BD%AEogg%E9%AB%98%E5%8F%AF%E7%94%A8%E7%AE%80%E5%8D%95%E4%BB%8B%E7%BB%8D/" class="post-title-link" itemprop="url">xag 配置ogg高可用简单介绍</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-10-12 22:40:00 / 修改时间：12:15:31" itemprop="dateCreated datePublished" datetime="2020-10-12T22:40:00+00:00">2020-10-12</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/oracle/" itemprop="url" rel="index"><span itemprop="name">oracle</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="xag-配置ogg高可用简单介绍"><a href="#xag-配置ogg高可用简单介绍" class="headerlink" title="xag 配置ogg高可用简单介绍"></a>xag 配置ogg高可用简单介绍</h1><h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>GI的独立代理简称为xag，通过这个xag独立代理，可以将tomcat、ogg、jde、mysql等作为资源加入GI管理，从而为资源保障高可用性，本次主要针对单实例运行的ogg。</p>
+<p>从11.2.0.3以后，XAG作为GI安装的一部分，无需额外安装，但XAG的新版本需独立安装。<br>综上，建议安装新版本XAG。</p>
+<h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><table>
+<thead>
+<tr>
+<th>源库</th>
+<th>11.2.0.4 单实例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>目标库</td>
+<td>和源库相同（不通schema测试table同步）</td>
+</tr>
+<tr>
+<td>downstream库</td>
+<td>11.2.0.4  RAC</td>
+</tr>
+<tr>
+<td>ogg version</td>
+<td>12.2.0.1.1</td>
+</tr>
+<tr>
+<td>xag version</td>
+<td>v7</td>
+</tr>
+</tbody></table>
+<p>本次由于xag要与gi结合使用，而gi是11.2所以使用低版本v7的xag，如果集群版本高的话推荐使用v10，支持微服务模式ogg。</p>
+<p>正好练习downstream库，所以源库需要和集群rac版本保持一致，方便redo发送到rac中间库进行解析，至于ogg搭建过程就省略了，主要简单介绍一下xag。</p>
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 下载解压</span></span><br><span class="line"></span><br><span class="line"><span class="comment">-- 安装（使用grid用户）</span></span><br><span class="line">./xagsetup.sh <span class="comment">--install --directory /u01/app/grid/xag_v7 --all_nodes</span></span><br><span class="line"></span><br><span class="line"><span class="comment">-- 配置grid、oracle xag环境变量path</span></span><br><span class="line">PATH=$PATH:/u01/app/grid/xag_v7/bin</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 查询version</span></span><br><span class="line">agctl query releaseversion</span><br></pre></td></tr></table></figure>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/10/12/xag%20%E9%85%8D%E7%BD%AEogg%E9%AB%98%E5%8F%AF%E7%94%A8%E7%AE%80%E5%8D%95%E4%BB%8B%E7%BB%8D/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/10/11/redhat7.6%20%E5%AE%89%E8%A3%85%20oracle%2012.2.0.1%20RAC%20%E5%B0%8F%E8%AE%A1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1057,112 +1160,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/11/19/oracle_11g_%E5%90%8C%E5%BA%93%E6%90%AD%E5%BB%BAogg%E6%B5%8B%E8%AF%95(GoldenGate)/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="姚刚">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="自律自由">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/11/19/oracle_11g_%E5%90%8C%E5%BA%93%E6%90%AD%E5%BB%BAogg%E6%B5%8B%E8%AF%95(GoldenGate)/" class="post-title-link" itemprop="url">oracle 11g 同库搭建ogg测试(GoldenGate)</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-11-19 22:00:00" itemprop="dateCreated datePublished" datetime="2019-11-19T22:00:00+00:00">2019-11-19</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-08-04 02:24:02" itemprop="dateModified" datetime="2020-08-04T02:24:02+00:00">2020-08-04</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/oracle/" itemprop="url" rel="index"><span itemprop="name">oracle</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="oracle-11g-同库搭建ogg测试-GoldenGate"><a href="#oracle-11g-同库搭建ogg测试-GoldenGate" class="headerlink" title="oracle 11g 同库搭建ogg测试(GoldenGate)"></a>oracle 11g 同库搭建ogg测试(GoldenGate)</h1><p><u>关于dg和ogg的优缺点就不说了，自己了解。第一次照着老师的做还是有一定的难度，参数比较多不理解，期间还涉及scn，搞很久搞不定，后面照着网上简单博客来，循序渐进练习，本文为很简单的入门数据同步，主要做记录，其中配置若有误请见谅！！！</u></p>
-<p><u>此次为了方便就同机搭建，所以mgr端口不同，如果不同机搭建，mgr端口可以一致</u></p>
-<h2 id="搭建环境"><a href="#搭建环境" class="headerlink" title="搭建环境"></a>搭建环境</h2><table>
-<thead>
-<tr>
-<th>name</th>
-<th>version</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>操作系统</td>
-<td>CentOS Linux release 7.6.1810 (Core)</td>
-</tr>
-<tr>
-<td>数据库版本</td>
-<td>Oracle Database 11g Enterprise Edition Release 11.2.0.4.0 - 64bit Production</td>
-</tr>
-<tr>
-<td>ogg版本</td>
-<td>Oracle GoldenGate Version 11.2.1.0.3 14400833 OGGCORE_11.2.1.0.3_PLATFORMS_120823.1258_FBO Linux, x64, 64bi</td>
-</tr>
-</tbody></table>
-<hr>
-<h3 id="1-新建ogg用户"><a href="#1-新建ogg用户" class="headerlink" title="1. 新建ogg用户"></a>1. 新建ogg用户</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">groupadd ogg</span><br><span class="line">useradd -g ogg -G oinstall,dba ogg</span><br><span class="line">echo &quot;oracle&quot;| passwd <span class="comment">--stdin oracle</span></span><br><span class="line"></span><br><span class="line"><span class="comment">--上传oracle goldengate安装文件解压</span></span><br><span class="line">rz</span><br><span class="line">mkdir sogg togg</span><br><span class="line">mkdir sogg/temp</span><br><span class="line">unzip V34339-01.zip</span><br><span class="line">tar -xf fbo_ggs_Linux_x64_ora11g_64bit.tar -C sogg/</span><br><span class="line">tar -xf fbo_ggs_Linux_x64_ora11g_64bit.tar -C togg/</span><br><span class="line"><span class="comment">--rm -f V34339-01.zip OGG_WinUnix_Rel_Notes_11.2.1.0.3.pdf  Oracle*</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="2-配置ogg环境变量"><a href="#2-配置ogg环境变量" class="headerlink" title="2. 配置ogg环境变量"></a>2. 配置ogg环境变量</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 注意，此次同机就一个用户，如果是双机的话2个系统都要创建用户和配置环境变量</span></span><br><span class="line"><span class="built_in">export</span> TMP=/tmp</span><br><span class="line"><span class="built_in">export</span> ORACLE_BASE=/u01/app/oracle</span><br><span class="line"><span class="built_in">export</span> ORACLE_HOME=/u01/app/oracle/product/11.2.0/dbhome_1</span><br><span class="line"><span class="built_in">export</span> ORACLE_SID=SRM</span><br><span class="line"><span class="built_in">export</span> PATH=/u01/app/oracle/product/11.2.0/dbhome_1/bin:/usr/sbin:/u01/app/oracle/product/11.2.0/dbhome_1/OPatch:/usr/<span class="built_in">local</span>/sbin:/usr/<span class="built_in">local</span>/bin:/usr/sbin:/usr/bin:/root/bin</span><br><span class="line"><span class="built_in">export</span> LD_LIBRARY_PATH=/u01/app/oracle/product/11.2.0/dbhome_1/lib:/lib:/usr/lib</span><br><span class="line"><span class="built_in">export</span> CLASSPATH=/u01/app/oracle/product/11.2.0/dbhome_1/JRE:/u01/app/oracle/product/11.2.0/dbhome_1/jlib:/u01/app/oracle/product/11.2.0/dbhome_1/rdbms/jlib</span><br><span class="line"><span class="built_in">export</span> NLS_LANG=AMERICAN_AMERICA.UTF8</span><br></pre></td></tr></table></figure>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2019/11/19/oracle_11g_%E5%90%8C%E5%BA%93%E6%90%AD%E5%BB%BAogg%E6%B5%8B%E8%AF%95(GoldenGate)/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1232,7 +1229,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">24</span>
+          <span class="site-state-item-count">25</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1243,7 +1240,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">35</span>
+        <span class="site-state-item-count">36</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

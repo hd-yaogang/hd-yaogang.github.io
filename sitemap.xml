@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://yoursite.com/2020/10/12/xag%20%E9%85%8D%E7%BD%AEogg%E9%AB%98%E5%8F%AF%E7%94%A8%E7%AE%80%E5%8D%95%E4%BB%8B%E7%BB%8D/</loc>
+    
+    <lastmod>2020-10-12</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://yoursite.com/2020/10/11/redhat7.6%20%E5%AE%89%E8%A3%85%20oracle%2012.2.0.1%20RAC%20%E5%B0%8F%E8%AE%A1/</loc>
     
     <lastmod>2020-10-12</lastmod>
@@ -439,6 +446,13 @@
   
   <url>
     <loc>http://yoursite.com/tags/12-2/</loc>
+    <lastmod>2020-10-12</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>http://yoursite.com/tags/ogg/</loc>
     <lastmod>2020-10-12</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
