@@ -191,6 +191,98 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/26/oracle_flashback1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="姚刚">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="自律自由">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2018/06/26/oracle_flashback1/" class="post-title-link" itemprop="url">oracle 恢复table删除数据 恢复package（使用闪回）</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-06-26 22:24:30" itemprop="dateCreated datePublished" datetime="2018-06-26T22:24:30+00:00">2018-06-26</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-08-04 02:24:02" itemprop="dateModified" datetime="2020-08-04T02:24:02+00:00">2020-08-04</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/oracle/" itemprop="url" rel="index"><span itemprop="name">oracle</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">好久没写东西了，今天写一篇凑个数吧，来公司一年多了，感觉自己到了一个小瓶颈期了。 以前每天很多新东西，都是忙着学，感觉没时间写博客总结一下，大部分都是写笔记，现在又是没东西可以写，每天干着95%都是重复的工作，大部分时间在运维，但我内心是把自己当做dba的，毕竟当初老大把我从java开发拉倒系统组^_^</span><br><span class="line">上次一个技术把表中的数据删除，这次是另一个技术把正确的包给覆盖了，我给恢复了，哈哈哈---有用的话看一下</span><br></pre></td></tr></table></figure>
+<p>参考博客：<a target="_blank" rel="noopener" href="https://blog.csdn.net/wyzxg/article/details/6761458">https://blog.csdn.net/wyzxg/article/details/6761458</a><br><code>虽然包恢复原理一样，但是操作差异一点，因为我的数据是12.2c的</code></p>
+<p>###正文1：表数据删除恢复</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--1、查询删除数据时间点之前的数据</span></span><br><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> 表名 <span class="keyword">as</span> <span class="keyword">of</span> <span class="built_in">timestamp</span> to_timestamp(<span class="string">&#x27;2016-08-11 16:12:11&#x27;</span>,<span class="string">&#x27;yyyy-mm-dd hh24:mi:ss&#x27;</span>)； <span class="comment">--（若没有数据 ，将时间继续提前）</span></span><br><span class="line"><span class="comment">--2、启用行移动功能</span></span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">table</span> 表名 <span class="keyword">enable</span> <span class="keyword">row</span> <span class="keyword">movement</span>;</span><br><span class="line"><span class="comment">--3、恢复数据（激动人心的时刻）</span></span><br><span class="line">flashback table 表名 to timestamp to_timestamp(&#x27;2016-08-11 16:12:11&#x27;,&#x27;yyyy-mm-dd hh24:mi:ss&#x27;);</span><br><span class="line">大功告成，数据恢复成功；</span><br></pre></td></tr></table></figure>
+<p>###正文2：包被覆盖错了，想要闪回package</p>
+<p><code>注意这里需要使用dba权限，否则查看不到</code></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--错误包：XXX_PKG 正确时间：中午12点</span></span><br><span class="line"><span class="keyword">SELECT</span> OBJECT_ID</span><br><span class="line">  <span class="keyword">FROM</span> all_objects </span><br><span class="line"> <span class="keyword">WHERE</span> OBJECT_NAME = <span class="string">&#x27;XXX_PKG&#x27;</span>;</span><br><span class="line"> <span class="comment">--如果包直接被删除了，不是被覆盖，那只能先闪回查询对象表</span></span><br><span class="line"> <span class="keyword">SELECT</span> OBJECT_ID</span><br><span class="line">  <span class="keyword">FROM</span> all_objects <span class="keyword">AS</span> <span class="keyword">OF</span> <span class="built_in">TIMESTAMP</span> TO_TIMESTAMP(<span class="string">&#x27;2018-06-26 12:00:00&#x27;</span>, <span class="string">&#x27;YYYY-MM-DD HH24:MI:SS&#x27;</span>)</span><br><span class="line"> <span class="keyword">WHERE</span> OBJECT_NAME = <span class="string">&#x27;XXX_PKG&#x27;</span>;</span><br><span class="line"> <span class="comment">--查到2个对象id，一个包头，一个包体</span></span><br><span class="line">93163</span><br><span class="line">94602</span><br><span class="line"><span class="comment">--根据对象id查询包头和包体内容</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="keyword">source</span></span><br><span class="line">  <span class="keyword">FROM</span> <span class="keyword">source</span>$ <span class="keyword">AS</span> <span class="keyword">OF</span> <span class="built_in">TIMESTAMP</span> TO_TIMESTAMP(<span class="string">&#x27;2018-06-26 12:00:00&#x27;</span>, <span class="string">&#x27;YYYY-MM-DD HH24:MI:SS&#x27;</span>)</span><br><span class="line"> <span class="keyword">where</span> obj<span class="comment"># = 93163;</span></span><br><span class="line"> <span class="keyword">SELECT</span> <span class="keyword">source</span></span><br><span class="line">  <span class="keyword">FROM</span> <span class="keyword">source</span>$ <span class="keyword">AS</span> <span class="keyword">OF</span> <span class="built_in">TIMESTAMP</span> TO_TIMESTAMP(<span class="string">&#x27;2018-06-26 12:00:00&#x27;</span>, <span class="string">&#x27;YYYY-MM-DD HH24:MI:SS&#x27;</span>)</span><br><span class="line"> <span class="keyword">where</span> obj<span class="comment"># = 94602;</span></span><br><span class="line"> <span class="comment">--然后确认没问题，用查到的sql内容重新覆盖就好</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">注意：一般package body的内容比较多，怎么复制下来呢？</span><br><span class="line">spool  &#x2F;home&#x2F;oracle&#x2F;xxx_pkg.sql</span><br><span class="line"></span><br><span class="line">SELECT source</span><br><span class="line">  FROM source$ AS OF TIMESTAMP TO_TIMESTAMP(&#39;2018-06-26 12:00:00&#39;, &#39;YYYY-MM-DD HH24:MI:SS&#39;)</span><br><span class="line"> where obj# &#x3D; 93163;</span><br><span class="line"></span><br><span class="line">spool off</span><br><span class="line">exit</span><br><span class="line">ll &#x2F;home&#x2F;oracle&#x2F;</span><br></pre></td></tr></table></figure>
+
+<p>###知识点<br>简单总结一下，这里就是利用了oracle的闪回查询功能，非常的简单，一看就懂了，但是oracle闪回有很多种包括删除表和数据库，闪回事务等等。<br>    最重要的是要理解<br>    SQL&gt; show parameter undo_retention;</p>
+<p>NAME                     TYPE                   VALUE</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2018/06/26/oracle_flashback1/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/26/oracle_12c_pdb_refresh_%E7%AE%80%E5%8D%95%E4%BB%8B%E7%BB%8D/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -722,7 +814,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">25</span>
+          <span class="site-state-item-count">26</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

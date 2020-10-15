@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/avatar.jpg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/avatar.jpg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/avatar.jpg">
+  <link rel="mask-icon" href="/images/avatar.jpg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Lato:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Roboto Mono:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"manual","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="2节点RAC数据库只能任一启动一个 – 故障小计关键词oracle 12.2 rac rp_filter No reconfig messages from other instances LMON is terminating the instanc Pending Sends: Yes Unacked Sends: Yes startup: ORA-03113: end-of-file on">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2节点RAC数据库只能任一启动一个 -- 故障小计">
+<meta property="og:url" content="http://yoursite.com/2020/10/16/2%E8%8A%82%E7%82%B9RAC%E6%95%B0%E6%8D%AE%E5%BA%93%E5%8F%AA%E8%83%BD%E4%BB%BB%E4%B8%80%E5%90%AF%E5%8A%A8%E4%B8%80%E4%B8%AA%20--%20%E6%95%85%E9%9A%9C%E5%B0%8F%E8%AE%A1/index.html">
+<meta property="og:site_name" content="自律自由">
+<meta property="og:description" content="2节点RAC数据库只能任一启动一个 – 故障小计关键词oracle 12.2 rac rp_filter No reconfig messages from other instances LMON is terminating the instanc Pending Sends: Yes Unacked Sends: Yes startup: ORA-03113: end-of-file on">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-10-16T00:20:00.000Z">
+<meta property="article:modified_time" content="2020-10-15T16:22:59.443Z">
+<meta property="article:author" content="姚刚">
+<meta property="article:tag" content="oracle">
+<meta property="article:tag" content="rac">
+<meta property="article:tag" content="12.2">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2020/10/16/2%E8%8A%82%E7%82%B9RAC%E6%95%B0%E6%8D%AE%E5%BA%93%E5%8F%AA%E8%83%BD%E4%BB%BB%E4%B8%80%E5%90%AF%E5%8A%A8%E4%B8%80%E4%B8%AA%20--%20%E6%95%85%E9%9A%9C%E5%B0%8F%E8%AE%A1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>2节点RAC数据库只能任一启动一个 -- 故障小计 | 自律自由</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="自律自由" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">自律自由</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">yaogang</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-commonweal">
+
+    <a href="/404.html" rel="section"><i class="heartbeat fa-fw"></i>公益 404</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/10/16/2%E8%8A%82%E7%82%B9RAC%E6%95%B0%E6%8D%AE%E5%BA%93%E5%8F%AA%E8%83%BD%E4%BB%BB%E4%B8%80%E5%90%AF%E5%8A%A8%E4%B8%80%E4%B8%AA%20--%20%E6%95%85%E9%9A%9C%E5%B0%8F%E8%AE%A1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="姚刚">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="自律自由">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          2节点RAC数据库只能任一启动一个 -- 故障小计
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-10-16 00:20:00" itemprop="dateCreated datePublished" datetime="2020-10-16T00:20:00+00:00">2020-10-16</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-10-15 16:22:59" itemprop="dateModified" datetime="2020-10-15T16:22:59+00:00">2020-10-15</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/oracle/" itemprop="url" rel="index"><span itemprop="name">oracle</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="2节点RAC数据库只能任一启动一个-–-故障小计"><a href="#2节点RAC数据库只能任一启动一个-–-故障小计" class="headerlink" title="2节点RAC数据库只能任一启动一个 – 故障小计"></a>2节点RAC数据库只能任一启动一个 – 故障小计</h1><h2 id="关键词"><a href="#关键词" class="headerlink" title="关键词"></a>关键词</h2><p><em>oracle 12.2 rac rp_filter</em></p>
+<p><em>No reconfig messages from other instances</em></p>
+<p><em>LMON is terminating the instanc</em></p>
+<p><em>Pending Sends: Yes Unacked Sends: Yes</em></p>
+<p><em>startup: ORA-03113: end-of-file on communication channel</em></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>前面安装的2套12.2的集群，主库正常使用了2周，今天给另一套做备库的集群搭建standby启动2个备库instance出现问题，2节点的rac其中一个始终无法启动，但是测试2个关闭后启动任意一个，都是可以正常启动的，再启动另一个就不行，因此判断db应该是没问题的，初步判断是网络问题导致instance通讯故障导致其中1个节点无法加入cluster。（加上甲方说前几天刚改过网络路由，于是自己更加相信是网路问题，同样2个集群4个服务器一起提供的资源，为啥主库没问题，更觉得是网络问题）</p>
+<h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><table>
+<thead>
+<tr>
+<th>操作系统</th>
+<th>redhat 7.6</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>内核版本</td>
+<td>3.10.0-1062.9.1.el7.x86_64</td>
+</tr>
+<tr>
+<td>GI版本</td>
+<td>12.2.0.1</td>
+</tr>
+<tr>
+<td>节点数</td>
+<td>2节点</td>
+</tr>
+<tr>
+<td>database_role</td>
+<td>PHYSICAL STANDBY</td>
+</tr>
+<tr>
+<td>pub   ip</td>
+<td>每节点1个（2个网卡bounding为1个ip）</td>
+</tr>
+<tr>
+<td>vip    ip</td>
+<td>每节点1个</td>
+</tr>
+<tr>
+<td>scan  ip</td>
+<td>使用1个</td>
+</tr>
+<tr>
+<td>priv   ip</td>
+<td>每节点2个（eth2、eth12  注意:未bound，直接使用集群自己负载均衡）</td>
+</tr>
+</tbody></table>
+<p>集群环境安装请参考之前博文（redhat7.6 安装 oracle 12.2.0.1 RAC 小计）</p>
+<h2 id="故障分析"><a href="#故障分析" class="headerlink" title="故障分析"></a>故障分析</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 创建standby：</span></span><br><span class="line">duplicate ... 略</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">修改参数文件，主要是cluster_database、instance_number、undo等改成rac数据库，然后关闭存活节点，同时启动2节点：</span><br><span class="line"><span class="comment">-- 启动 DB，开始报错</span></span><br><span class="line">srvctl <span class="keyword">start</span> <span class="keyword">database</span> -d orcldg</span><br><span class="line"><span class="comment">---------------------------------------------------------</span></span><br><span class="line">PRCR<span class="number">-1079</span> : <span class="keyword">Failed</span> <span class="keyword">to</span> <span class="keyword">start</span> <span class="keyword">resource</span> ora.orcldg.db</span><br><span class="line">CRS<span class="number">-5017</span>: The <span class="keyword">resource</span> <span class="keyword">action</span> <span class="string">&quot;ora.orcldg.db start&quot;</span> encountered the <span class="keyword">following</span> <span class="keyword">error</span>:</span><br><span class="line">ORA<span class="number">-03113</span>: <span class="keyword">end</span>-<span class="keyword">of</span>-<span class="keyword">file</span> <span class="keyword">on</span> communication channel</span><br><span class="line">Process <span class="keyword">ID</span>: <span class="number">0</span></span><br><span class="line"><span class="keyword">Session</span> <span class="keyword">ID</span>: <span class="number">0</span> <span class="built_in">Serial</span> <span class="built_in">number</span>: <span class="number">0</span></span><br><span class="line"><span class="comment">---------------------------------------------------------</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="查看db-alert日志"><a href="#查看db-alert日志" class="headerlink" title="查看db alert日志"></a>查看db alert日志</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 这是错误节点日志，正常节点alert无任何异常（请忽略时间）</span></span><br><span class="line">Starting background process MARK</span><br><span class="line">2017-04-18T13:12:14.468472-04:00</span><br><span class="line">MARK started <span class="keyword">with</span> pid=<span class="number">61</span>, OS <span class="keyword">id</span>=<span class="number">6843</span></span><br><span class="line"><span class="number">2017</span><span class="number">-04</span><span class="number">-18</span>T13:<span class="number">12</span>:<span class="number">14.522134</span><span class="number">-04</span>:<span class="number">00</span></span><br><span class="line">NOTE: MARK has subscribed</span><br><span class="line"><span class="number">2017</span><span class="number">-04</span><span class="number">-18</span>T13:<span class="number">12</span>:<span class="number">15.938855</span><span class="number">-04</span>:<span class="number">00</span></span><br><span class="line"><span class="keyword">Using</span> <span class="keyword">default</span> pga_aggregate_limit <span class="keyword">of</span> <span class="number">7680</span> MB</span><br><span class="line"></span><br><span class="line"><span class="comment">-- &lt;&lt;&lt;注意，pga内存输出后开始报错，无法正常nomount</span></span><br><span class="line"><span class="keyword">Instance</span> termination initiated <span class="keyword">by</span> <span class="keyword">instance</span> <span class="number">1</span> <span class="keyword">with</span> reason <span class="number">1.</span></span><br><span class="line"><span class="keyword">Instance</span> <span class="number">1</span> received a reconfig <span class="keyword">event</span> <span class="keyword">from</span> its cluster manager indicating that this <span class="keyword">instance</span> <span class="keyword">is</span> supposed <span class="keyword">to</span> be down</span><br><span class="line">Please <span class="keyword">check</span> <span class="keyword">instance</span> <span class="number">1</span> alert <span class="keyword">log</span> <span class="keyword">and</span> LMON <span class="keyword">trace</span> <span class="keyword">file</span> <span class="keyword">for</span> more details.</span><br><span class="line">Please also examine the CSS <span class="keyword">log</span> files.</span><br><span class="line">LMON (ospid: <span class="number">6725</span>): terminating the <span class="keyword">instance</span> due <span class="keyword">to</span> <span class="keyword">error</span> <span class="number">481</span></span><br><span class="line"><span class="number">2017</span><span class="number">-04</span><span class="number">-18</span>T13:<span class="number">16</span>:<span class="number">49.129748</span><span class="number">-04</span>:<span class="number">00</span></span><br><span class="line"><span class="keyword">System</span> state dump requested <span class="keyword">by</span> (<span class="keyword">instance</span>=<span class="number">2</span>, osid=<span class="number">6725</span> (LMON)), summary=[abnormal <span class="keyword">instance</span> termination].</span><br><span class="line"><span class="keyword">System</span> State dumped <span class="keyword">to</span> <span class="keyword">trace</span> <span class="keyword">file</span> /orabase/diag/rdbms/xxxxx/xxxxx/<span class="keyword">trace</span>/xxxxxx_diag_6673_20170418131649.trc</span><br><span class="line"><span class="number">2017</span><span class="number">-04</span><span class="number">-18</span>T13:<span class="number">16</span>:<span class="number">49.391105</span><span class="number">-04</span>:<span class="number">00</span></span><br><span class="line">Dumping diagnostic <span class="keyword">data</span> <span class="keyword">in</span> <span class="keyword">directory</span>=[cdmp_20170418131649], requested <span class="keyword">by</span> (<span class="keyword">instance</span>=<span class="number">2</span>, osid=<span class="number">6725</span> (LMON)), summary=[abnormal <span class="keyword">instance</span> termination].</span><br><span class="line"><span class="number">2017</span><span class="number">-04</span><span class="number">-18</span>T13:<span class="number">16</span>:<span class="number">50.535863</span><span class="number">-04</span>:<span class="number">00</span></span><br><span class="line"><span class="keyword">Instance</span> <span class="keyword">terminated</span> <span class="keyword">by</span> LMON, pid = <span class="number">6725</span></span><br><span class="line"></span><br><span class="line"><span class="comment">-- 提示我们查询lmon和diag日志</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="查看diag日志"><a href="#查看diag日志" class="headerlink" title="查看diag日志"></a>查看diag日志</h3><p>里面是问题节点 system dump，未发现明显异常，看到很多rpc等待和db关键process都为dead。</p>
+<h3 id="查看lmon日志"><a href="#查看lmon日志" class="headerlink" title="查看lmon日志"></a>查看lmon日志</h3><p>问题节点最新lmon显示未收到reconfig信息，所以通过vot磁盘收到kill请求，被踢出无法正常启动。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">No reconfig messages from other instances <span class="keyword">in</span> the cluster during startup. Hence, LMON is terminating the instance. Please check the network logs of this instance as well as the network health of the cluster <span class="keyword">for</span> problems</span><br></pre></td></tr></table></figure>
+
+<p>正常节点最新lmon日志，显示这个runing的节点向刚刚后面启动的故障节点发送reconfig信息的时候packge信息被delete了, route outstand … (其中发现奇怪的是，2个节点priv使用的eth2和eth12，asm和db启动alert中也明确显示使用了2个相应的169的haip，但是这里报错 Local Address: <privateIP_node2_eth2>:64828 Remote Address: <privateIP_node1_eth12>:50737  –&gt; 也就是说2个priv ip的haip地址交互交叉了，本地的eth2的64828端口和eth12的50737端口交互，但不通（<em>其实这里就是重点，只不过我未发现当时</em>）</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">kjxgrssvote_check_conn_i: reqid 1, check-only no, timeout <span class="keyword">in</span> 38 sec</span><br><span class="line">kjxgrssvote_check_conn_i: netcheck inst map: 1 2</span><br><span class="line">IPCLW:[0.0]&#123;E&#125;[WAIT]:PROTO: [343641687000]ACNH 0000023320A3FA68: 16 attempts to connect:</span><br><span class="line">IPCLW:[0.1]&#123;-&#125;[WAIT]:UTIL: [343641687000] ACNH 0000023320A3FA68 State: 0 MSN: 8841 Seq: 32400 <span class="comment"># Pending: 2</span></span><br><span class="line">IPCLW:[0.2]&#123;-&#125;[WAIT]:UTIL: [343641687000] Peer: [UNKNWN].0 AckSeq: 0</span><br><span class="line">IPCLW:[0.3]&#123;-&#125;[WAIT]:UTIL: [343641687000] Flags: 0x00000000 IHint: 0x2e590000001f THint: 0x0</span><br><span class="line">IPCLW:[0.4]&#123;-&#125;[WAIT]:UTIL: [343641687000] Local Address: &lt;privateIP_node2&gt;:64828 Remote Address: &lt;privateIP_node1&gt;:50737</span><br><span class="line">IPCLW:[0.5]&#123;-&#125;[WAIT]:UTIL: [343641687000] Remote PID: ver 0 flags 1 trans 2 tos 0 opts 0 xdata3 a9c5 xdata2 afd6b420</span><br><span class="line">IPCLW:[0.6]&#123;-&#125;[WAIT]:UTIL: [343641687000] : mmsz 32768 mmr 4096 mms 4096 xdata 4f7d10</span><br><span class="line">IPCLW:[0.7]&#123;-&#125;[WAIT]:UTIL: [343641687000] IVPort: 6259 TVPort: 32016 IMPT: 15357 RMPT: 43461 Pending Sends: Yes Unacked Sends: Yes</span><br><span class="line">IPCLW:[0.8]&#123;-&#125;[WAIT]:UTIL: [343641687000] Send Engine Queued: No sshdl -1 ssts 0 rtts 0 snderrchk 0 creqcnt 16</span><br><span class="line">IPCLW:[0.9]&#123;-&#125;[WAIT]:UTIL: [343641687000] Unackd Messages 8839 -&gt; 8840. SSEQ 32398 Send Time: INVALID TIME SMSN <span class="comment"># Xmits: 0 EMSN INVALID TIME</span></span><br><span class="line">IPCLW:[0.10]&#123;-&#125;[WAIT]:UTIL: [343641687000] Pending send queue:</span><br></pre></td></tr></table></figure>
+
+<h3 id="查看crs日志"><a href="#查看crs日志" class="headerlink" title="查看crs日志"></a>查看crs日志</h3><p>问题节点$GRID_BASE/diag/crs…/trace/alert日志显示 ora.orcldg.db 资源有问题，无法启动：（也无明显问题能定位原因）</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[Thread-1270] [ 2017-04-18 13:16:57.125 EDT ] [CRSNative.genericStartResource:569] CRS-5017: The resource action <span class="string">&quot;ora.orcldg.db start&quot;</span> encountered the following error:</span><br><span class="line">ORA-03113: end-of-file on communication channel</span><br><span class="line">Process ID: 0</span><br><span class="line">Session ID: 0 Serial number: 0</span><br><span class="line">. For details refer to <span class="string">&quot;(:CLSN00107:)&quot;</span> <span class="keyword">in</span> <span class="string">&quot;/orabase/diag/crs/xxxxxx/crs/trace/crsd_oraagent_oracle.trc&quot;</span>.</span><br><span class="line"></span><br><span class="line">CRS-2674: Start of <span class="string">&#x27;ora.orcldg.db&#x27;</span> on <span class="string">&#x27;node01&#x27;</span> failed</span><br><span class="line">CRS-2632: There are no more servers to try to place resource <span class="string">&#x27;ora.orcldg.db&#x27;</span> on that would satisfy its placement policy</span><br><span class="line">oracle.cluster.impl.crs.cops.CRSNativeResult.createException(CRSNativeResult.java:617)</span><br><span class="line">oracle.cluster.impl.crs.cops.CRSNative.doStartResource(Native Method)</span><br></pre></td></tr></table></figure>
+
+<h3 id="手动检查网络"><a href="#手动检查网络" class="headerlink" title="手动检查网络"></a>手动检查网络</h3><p>ping 对端 pub ip、vip、2个priv ip都是正常的，这也不奇怪，如果集群层面出现网络问题的话，集群层面的网络心跳故障， 早就会有集群节点故障或者导致某个节点cluster被重启了，甚者重启节点。</p>
+<p>cluvfy验证：cluvfy comp nodereach/nodecon/clu 几个命令校验了集群网络，完整性，除了resolve.conf告警，因为集群安装使用的是 /etc/hosts配置的ip解析可以忽略，所以都是正常的。</p>
+<p>到这里我觉得是 2个priv ip的虚拟ip 169.254.xxx.xxx，oracle这2个haip出问题了，2个priv的物理网卡192.168的地址应该是正常的，否则集群应该是不正常的，现在只有db实例不正常。</p>
+<p>谷歌和mos发现和我情况一样文章 (Doc ID 2528588.1) ，也是12.2 rac其中一节点无法启动，故障现象和报错都一致，文中说明是dbca建新库或是老库修改过网络导致2个节点无法同时启动，请检查priv网络和防火墙，没有具体说明如何排错网络。（其实oracle dba本来就还挺难的，服务器、网络、存储都需要涉及了解一些，后面又发现一篇文章，大佬就是自己tcpdump抓包确定网络问题，然后对比不同服务器操作系统正常和异常的内核参数值发现rp_filter参数值导致网络问题的）</p>
+<p>》》》</p>
+<p>当时我到这里就卡住了，想着要不把haip禁用，直接使用priv ip作为集群互联。这虽然能解决问题，但是未发现本次故障根因。</p>
+<p>想着虽是客户standby，但也是生产环境，秉着严谨态度，想找出为什么2个haip会有问题，而主库集群也是一样配置，确实正常的。</p>
+<p>》》》</p>
+<p>幸运的是今天有位原厂oracle大佬帮忙一起排查，在他指导下顺利发现了问题，如下：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 测试1.显示设置DB参数 cluster_interconnects</span></span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">system</span> <span class="keyword">set</span> cluster_interconnects=<span class="string">&#x27;192.168.4.1&#x27;</span> <span class="keyword">sid</span>=<span class="string">&#x27;orcl1&#x27;</span> <span class="keyword">scope</span> =<span class="keyword">spfile</span>;</span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">system</span> <span class="keyword">set</span> cluster_interconnects=<span class="string">&#x27;192.168.4.2&#x27;</span> <span class="keyword">sid</span>=<span class="string">&#x27;orcl2&#x27;</span> <span class="keyword">scope</span> =<span class="keyword">spfile</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 测试2.显示设置DB参数 cluster_interconnects</span></span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">system</span> <span class="keyword">set</span> cluster_interconnects=<span class="string">&#x27;192.168.5.1&#x27;</span> <span class="keyword">sid</span>=<span class="string">&#x27;orcl1&#x27;</span> <span class="keyword">scope</span> =<span class="keyword">spfile</span>;</span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">system</span> <span class="keyword">set</span> cluster_interconnects=<span class="string">&#x27;192.168.5.2&#x27;</span> <span class="keyword">sid</span>=<span class="string">&#x27;orcl2&#x27;</span> <span class="keyword">scope</span> =<span class="keyword">spfile</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 测试2.显示设置DB参数 cluster_interconnects</span></span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">system</span> <span class="keyword">set</span> cluster_interconnects=<span class="string">&#x27;192.168.4.1:192.168.5.1&#x27;</span> <span class="keyword">sid</span>=<span class="string">&#x27;orcl1&#x27;</span> <span class="keyword">scope</span> =<span class="keyword">spfile</span>;</span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">system</span> <span class="keyword">set</span> cluster_interconnects=<span class="string">&#x27;192.168.5.2&#x27;</span> <span class="keyword">sid</span>=<span class="string">&#x27;orcl2&#x27;</span> <span class="keyword">scope</span> =<span class="keyword">spfile</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 上面测试指定的ip使用4.x/5.x对应的169.254的haip也是一样的，因为都是priv网卡的虚拟ip</span></span><br><span class="line">测试1、2都是成功的，2个节点DB实例正常都可以启动，测试3失败，node1配置4.1、5.1和node2只配置5.2网络错位了，果然后面一个node无法启动成功，这时没在往下测试了，发现好像网络错位确实不行。</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 于是在主库和standby库指定ping对比：</span></span><br><span class="line">ping  -I  192.168.4.1  192.168.4.2        <span class="comment">-- 这显然可以</span></span><br><span class="line">ping  -I  192.168.4.1  192.168.5.2        <span class="comment">-- 正常的主库集群可以，这次故障的备库集群不行（就是从4.x网络无法ping通另一不同网段的5.x网段ip）</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>最后终于发现问题，主库集群和备库集群同是相同硬件和rhel7.6系统资源，但是主库是模板安装，备库是手工配置的，所以内核参数sysctl.conf中未修改rp_filter参数，导致默认参数会对网络数据包源地址进行严格校验，所以备库上面那个：ping  -I 网络不通，在网络层面就是不通，在DB层面就是新启动节点的reconfig信息无法从reconfig master节点收到，导致后面的db instance无法启动。</p>
+<h2 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 修改或者添加 standby 集群2节点内核参数并使之生效：</span></span><br><span class="line">vim /etc/sysctl.conf <span class="comment"># 或者 /etc/sysctl.d/98-oracle.conf</span></span><br><span class="line"></span><br><span class="line">net.ipv4.conf.all.rp_filter=0</span><br><span class="line">net.ipv4.conf.eth2.rp_filter=0        <span class="comment"># eth2为第1个priv 网卡接口（按需修改）</span></span><br><span class="line">net.ipv4.conf.eth12.rp_filter=0        <span class="comment"># eth12为第2个priv 网卡接口（按需修改）</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 生效</span></span><br><span class="line">sysctl -p</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>然后再次测试之前ping  -I 地址已经成功ping通，将之前测试的DB参数cluster_interconnects进行reset还原，重启2个instance，都正常启动。</p>
+<h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><p>rp_filter参数控制系统网络包响应返回路劲检查：0为不检查，1为检查，2为宽松模式，oracle推荐为2，一般设置成0或者2应该都行。</p>
+<p>后面检查11g发现，11g使用2个priv ip来负载均衡内网不需要配置rp_filter也是可以的，即上面测试ping  -I 从priv网卡1到节点2网卡2不通2节点DB也是正常的。可能是12c的DB的内网交互网络这块不同，asm也是同时使用2个haip不配置rp_filter参数也是正常都启动的，估计就DB的消息交互可能会网卡错开，导致校验错误，Linux 6和7默认都是1，启用校验。</p>
+<p><strong>反思：</strong></p>
+<p>这个参数单实例、或者rac使用单个priv ip，或者多个priv ip bounding后应该不配置也都不影响（oracle现在priv自己负载均衡，不需要priv 聚合，pub使用聚合），但这次恰好甲方环境严格，资源至少都是2路冗余的，导致未能及时发现问题。另外就是自己也大意，对于新装的环境，新建的库，以为都是统一一样的模板自动化安装配置，服务器环境应该是一致的，加上网络改过路由，就没想到去校验一下主机参数配置。</p>
+<p>所以还是要严格安装规范来，很多时候觉得安装个库很简单，但由于不规范，比如参数或者资源限制修改不到位，莫名其妙出问题，db和crs的alert提示不太具体明确，没有遇到过没经验的话还是很难一下发现定位到问题。（另外关于rac的架构和知识也要多学习掌握，比如资源启动和管理，crs和db的几种心跳，cluster_interconnects…参数使用）</p>
+<p>当时没定位到rp_filter参数问题前，仅靠db和crs alert日志信息还是很难在谷歌和mos找到具体问题和答案，所以除了掌握基础知识，提高问题解决能力外，积累经验还是非常重要啊，哈哈 ^_^</p>
+<h2 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h2><ul>
+<li><p><strong>mos文章：</strong>Only One Instance of a RAC Database Can Start at a Time: Second Instance Fails to Start due to “No reconfig messages from other instances” - LMON is terminating the instance (Doc ID 2528588.1)</p>
+</li>
+<li><p><strong>mos文章：</strong>DBCA Second/last instance startup fails/ generic startup with ORA-03113 in 12.2 due to wrong rp_filter setting for private interconnect interfaces (Doc ID 2260078.1)</p>
+</li>
+<li><p><strong>mos文章：</strong>rp_filter for multiple private interconnects OL7 (Doc ID 2216652.1)</p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="http://blog.itpub.net/31547066/viewspace-2222482/">ITPUB文章：老司机遇到的ORACLE 12C安装问题</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/717e6cd9d2bb">rp_filter内核参数介绍</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://docs.oracle.com/en/database/oracle/oracle-database/12.2/refrn/CLUSTER_INTERCONNECTS.html#GUID-6B0B0F1D-3DB0-415B-B914-2649FE02E4DA">cluster_interconnects使用</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://docs.oracle.com/en/database/oracle/oracle-database/18/cwlin/multiple-private-interconnects-and-oracle-linux.html#GUID-B9508AD5-AFD6-4D34-9DA9-773D44FD43A0">18c官方文档说明：Multiple Private Interconnects and Oracle Linux</a></p>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/oracle/" rel="tag"># oracle</a>
+              <a href="/tags/rac/" rel="tag"># rac</a>
+              <a href="/tags/12-2/" rel="tag"># 12.2</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/10/12/xag%20%E9%85%8D%E7%BD%AEogg%E9%AB%98%E5%8F%AF%E7%94%A8%E7%AE%80%E5%8D%95%E4%BB%8B%E7%BB%8D/" rel="prev" title="xag 配置ogg高可用简单介绍">
+      <i class="fa fa-chevron-left"></i> xag 配置ogg高可用简单介绍
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#2%E8%8A%82%E7%82%B9RAC%E6%95%B0%E6%8D%AE%E5%BA%93%E5%8F%AA%E8%83%BD%E4%BB%BB%E4%B8%80%E5%90%AF%E5%8A%A8%E4%B8%80%E4%B8%AA-%E2%80%93-%E6%95%85%E9%9A%9C%E5%B0%8F%E8%AE%A1"><span class="nav-number">1.</span> <span class="nav-text">2节点RAC数据库只能任一启动一个 – 故障小计</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B3%E9%94%AE%E8%AF%8D"><span class="nav-number">1.1.</span> <span class="nav-text">关键词</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.2.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%8E%AF%E5%A2%83"><span class="nav-number">1.3.</span> <span class="nav-text">环境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%85%E9%9A%9C%E5%88%86%E6%9E%90"><span class="nav-number">1.4.</span> <span class="nav-text">故障分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8Bdb-alert%E6%97%A5%E5%BF%97"><span class="nav-number">1.4.1.</span> <span class="nav-text">查看db alert日志</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8Bdiag%E6%97%A5%E5%BF%97"><span class="nav-number">1.4.2.</span> <span class="nav-text">查看diag日志</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8Blmon%E6%97%A5%E5%BF%97"><span class="nav-number">1.4.3.</span> <span class="nav-text">查看lmon日志</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8Bcrs%E6%97%A5%E5%BF%97"><span class="nav-number">1.4.4.</span> <span class="nav-text">查看crs日志</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%89%8B%E5%8A%A8%E6%A3%80%E6%9F%A5%E7%BD%91%E7%BB%9C"><span class="nav-number">1.4.5.</span> <span class="nav-text">手动检查网络</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3"><span class="nav-number">1.5.</span> <span class="nav-text">解决</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%93%E8%AF%AD"><span class="nav-number">1.6.</span> <span class="nav-text">结语</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%AB%A0"><span class="nav-number">1.7.</span> <span class="nav-text">参考文章</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">姚刚</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">26</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">36</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://hd-yaogang.github.io/" title="GitHub → https:&#x2F;&#x2F;hd-yaogang.github.io" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2017 – 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">姚刚</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+<div class="powered-by">
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <i class="fa fa-user-md"></i>
+    <span id="busuanzi_container_site_uv">
+        本站访客数:<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span id="busuanzi_container_site_pv">
+        本站访问量<span id="busuanzi_value_site_pv"></span>
+    </span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
